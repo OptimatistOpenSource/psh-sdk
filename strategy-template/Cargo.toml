@@ -1,0 +1,17 @@
+[package]
+name = "strategy-template"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "strategy"
+crate-type = ["cdylib"]
+
+#[profile.release]
+#lto = true
+#strip = true
+#codegen-units = 1
+
+[dependencies]
+strategy-macros = { path = "../strategy-macros" }
+strategy-prelude = { path = "../strategy-prelude" }

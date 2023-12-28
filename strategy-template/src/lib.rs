@@ -1,8 +1,8 @@
 #![no_std]
 
-use strategy_prelude::*;
+use strategy::op;
 
-#[strategy_macros::main]
+#[strategy::main]
 fn main() {
     op::log("Hello world!");
 }

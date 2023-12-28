@@ -13,5 +13,4 @@ crate-type = ["cdylib"]
 #codegen-units = 1
 
 [dependencies]
-strategy-macros = { path = "../strategy-macros" }
-strategy-prelude = { path = "../strategy-prelude" }
+strategy = { path = "..", features = ["strategy-dev"] }

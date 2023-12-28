@@ -1,0 +1,19 @@
+[package]
+name = "strategy"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = [
+    "strategy-compiler",
+    "strategy-macros",
+    "strategy-prelude",
+    "strategy-template",
+]
+
+[features]
+strategy-dev = []
+
+[dependencies]
+strategy-macros = { path = "./strategy-macros" }
+strategy-prelude = { path = "./strategy-prelude" }

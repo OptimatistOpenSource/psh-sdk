@@ -1,7 +1,6 @@
 #![crate_type = "proc-macro"]
 
 use proc_macro::TokenStream;
-use syn::__private::ToTokens;
 
 #[proc_macro_attribute]
 pub fn main(_: TokenStream, mut ts: TokenStream) -> TokenStream {

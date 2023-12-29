@@ -5,15 +5,25 @@ edition = "2021"
 
 [workspace]
 members = [
-    "strategy-compiler",
     "strategy-macros",
     "strategy-prelude",
     "strategy-runtime",
+]
+exclude = [
+    "strategy-compiler",
     "strategy-template",
+    "test-resources",
 ]
 
 [features]
-strategy-dev = []
+strategy-dev = ["strategy-macros", "strategy-prelude"]
+strategy-macros = []
+strategy-prelude = []
+
+#[profile.release]
+#lto = true
+#strip = true
+#codegen-units = 1
 
 [dependencies]
 strategy-macros = { path = "./strategy-macros" }

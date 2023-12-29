@@ -1,33 +1,57 @@
-use crate::op;
+mod op;
+
 use crate::strategy::engine::StrategyEngine;
 use crate::strategy::Strategy;
-use std::fs;
+use std::{fs, panic};
+use std::process::Command;
 
-#[test]
-fn test() {
-    let wasm = fs::read("").unwrap(); // TODO
-    let strategy = Strategy::from_wasm(wasm);
+pub fn gen_engine() -> StrategyEngine {
+    use crate::op::wrapped as op;
     let mut engine = StrategyEngine::new();
     engine
-        .link_op("log", op::wrapped::log)
+        .link_op("log", op::log)
         .unwrap()
-        .link_op("exit", op::wrapped::exit)
+        .link_op("exit", op::exit)
         .unwrap()
-        .link_op("file-is-exist", op::wrapped::file::is_exist)
+        .link_op("file-is-exist", op::file::is_exist)
         .unwrap()
-        .link_op("file-read", op::wrapped::file::read)
+        .link_op("file-read", op::file::read)
         .unwrap()
-        .link_op("file-write", op::wrapped::file::write)
+        .link_op("file-write", op::file::write)
         .unwrap()
-        .link_op("file-append", op::wrapped::file::append)
+        .link_op("file-append", op::file::append)
         .unwrap();
-    /*
-    let strategy = engine
-        .precompile_strategy(strategy)
-        .unwrap();
-    */
-    let logs = engine.run_strategy(strategy).unwrap();
-    for log in logs {
-        println!("{}", log)
-    }
+    engine
+}
+
+fn compile_sc() {
+    let mut cargo_build_sc = {
+        let mut cmd = Command::new("cargo");
+        cmd.args([
+            "build",
+            "--release",
+            "--manifest-path",
+            "../strategy-compiler/Cargo.toml",
+        ]);
+        cmd
+    };
+    let output = cargo_build_sc.output().unwrap();
+    println!("{}", String::from_utf8(output.stdout).unwrap());
+    println!("{}", String::from_utf8(output.stderr).unwrap());
+}
+
+pub fn compile_strategy(project_path: &str) -> String {
+    compile_sc();
+    let bin_name = project_path.replace('.', "_").replace('/', "-");
+    let bin_path = format!("{}/target/{}", project_path, bin_name);
+    let mut compile_strategy = {
+        let sc_path = "../strategy-compiler/target/release/sc";
+        let mut cmd = Command::new(sc_path);
+        cmd.args(["-p", project_path, "-o", bin_path.as_str()]);
+        cmd
+    };
+    let output = compile_strategy.output().unwrap();
+    println!("{}", String::from_utf8(output.stdout).unwrap());
+    println!("{}", String::from_utf8(output.stderr).unwrap());
+    bin_path
 }

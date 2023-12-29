@@ -1,9 +1,10 @@
 #![crate_type = "proc-macro"]
 
 use proc_macro::TokenStream;
+use syn::__private::ToTokens;
 
 #[proc_macro_attribute]
-pub fn main(_: TokenStream, mut ts: TokenStream) -> TokenStream {
+pub fn main(_: TokenStream, ts: TokenStream) -> TokenStream {
     let main_fn = syn::parse::<syn::ItemFn>(ts.clone())
         .expect("`#[strategy::main]` can only be applied to fn item");
 
@@ -12,7 +13,7 @@ pub fn main(_: TokenStream, mut ts: TokenStream) -> TokenStream {
         const _: () = {{
             #[export_name = "main"]
             unsafe extern "C" fn main() {{
-                {}()
+                {}
             }}
 
             #[export_name = "alloc"]
@@ -27,9 +28,8 @@ pub fn main(_: TokenStream, mut ts: TokenStream) -> TokenStream {
             }}
         }};
         "#,
-        main_fn.sig.ident.to_string()
+        main_fn.block.to_token_stream()
     );
 
-    ts.extend(trait_impl.parse::<TokenStream>().unwrap());
-    ts
+    trait_impl.parse::<TokenStream>().unwrap()
 }

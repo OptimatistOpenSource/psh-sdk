@@ -29,3 +29,18 @@ pub fn append(path: &str, contents: &str) -> Result<(), String> {
         .and_then(|mut it| write!(it, "{}", contents))
         .map_err(|e| e.to_string())
 }
+
+#[inline]
+pub fn remove_file(path: &str) -> Result<(), String> {
+    fs::remove_file(path).map_err(|e| e.to_string())
+}
+
+#[inline]
+pub fn create_dir(path: &str) -> Result<(), String> {
+    fs::create_dir_all(path).map_err(|e| e.to_string())
+}
+
+#[inline]
+pub fn remove_dir(path: &str) -> Result<(), String> {
+    fs::remove_dir_all(path).map_err(|e| e.to_string())
+}

@@ -78,3 +78,59 @@ pub fn append(
         }
     }
 }
+
+pub fn remove_file(
+    mut caller: Caller<Data>,
+    ret_area_vm_ptr: u32,
+    path_vm_ptr: u32,
+    path_len: u32,
+) {
+    let caller = &mut caller;
+    unsafe {
+        let ret_area = &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]);
+        let path = get_str(caller, path_vm_ptr, path_len).to_string();
+        match op::file::remove_file(&path) {
+            Ok(_) => {
+                ret_area[0] = 1;
+            }
+            Err(e) => {
+                let vm_ptr = copy_to_vm(caller, e.as_str());
+                *ret_area = [0, vm_ptr, e.len() as _];
+            }
+        }
+    }
+}
+
+pub fn create_dir(mut caller: Caller<Data>, ret_area_vm_ptr: u32, path_vm_ptr: u32, path_len: u32) {
+    let caller = &mut caller;
+    unsafe {
+        let ret_area = &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]);
+        let path = get_str(caller, path_vm_ptr, path_len).to_string();
+        match op::file::create_dir(&path) {
+            Ok(_) => {
+                ret_area[0] = 1;
+            }
+            Err(e) => {
+                let vm_ptr = copy_to_vm(caller, e.as_str());
+                *ret_area = [0, vm_ptr, e.len() as _];
+            }
+        }
+    }
+}
+
+pub fn remove_dir(mut caller: Caller<Data>, ret_area_vm_ptr: u32, path_vm_ptr: u32, path_len: u32) {
+    let caller = &mut caller;
+    unsafe {
+        let ret_area = &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]);
+        let path = get_str(caller, path_vm_ptr, path_len).to_string();
+        match op::file::remove_dir(&path) {
+            Ok(_) => {
+                ret_area[0] = 1;
+            }
+            Err(e) => {
+                let vm_ptr = copy_to_vm(caller, e.as_str());
+                *ret_area = [0, vm_ptr, e.len() as _];
+            }
+        }
+    }
+}

@@ -2,8 +2,8 @@ mod op;
 
 use crate::strategy::engine::StrategyEngine;
 use crate::strategy::Strategy;
-use std::{fs, panic};
 use std::process::Command;
+use std::{fs, panic};
 
 pub fn gen_engine() -> StrategyEngine {
     use crate::op::wrapped as op;
@@ -20,6 +20,12 @@ pub fn gen_engine() -> StrategyEngine {
         .link_op("file-write", op::file::write)
         .unwrap()
         .link_op("file-append", op::file::append)
+        .unwrap()
+        .link_op("file-remove-file", op::file::remove_file)
+        .unwrap()
+        .link_op("file-create-dir", op::file::create_dir)
+        .unwrap()
+        .link_op("file-remove-dir", op::file::remove_dir)
         .unwrap();
     engine
 }

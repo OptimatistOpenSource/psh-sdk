@@ -1,6 +1,6 @@
-use std::fs;
 use crate::strategy::Strategy;
 use crate::test::{compile_strategy, gen_engine};
+use std::fs;
 
 #[test]
 fn test_exit() {

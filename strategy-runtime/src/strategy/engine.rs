@@ -53,7 +53,8 @@ impl StrategyEngine {
                 unsafe { Module::deserialize(&se.wasm_engine, &strategy.bytes) }
             } else {
                 Module::new(&se.wasm_engine, &strategy.bytes)
-            }.map_err(|e| (Data::new(), e))?;
+            }
+            .map_err(|e| (Data::new(), e))?;
 
             let mut wasm_store = {
                 let data = Data::new(); // for log storage
@@ -62,7 +63,8 @@ impl StrategyEngine {
                 store
             };
 
-            let result = se.wasm_linker
+            let result = se
+                .wasm_linker
                 .instantiate(&mut wasm_store, &wasm_module)
                 .map_err(|e| (Data::new(), e))?
                 .get_typed_func::<(), ()>(&mut wasm_store, "main")
@@ -72,14 +74,14 @@ impl StrategyEngine {
             let data = wasm_store.into_data();
             match result {
                 Ok(_) => Ok(data),
-                Err(e) => Err((data, e))
+                Err(e) => Err((data, e)),
             }
         }
 
         let strategy = strategy.borrow();
         match inner(self, strategy) {
             Ok(data) => (data, Ok(())),
-            Err((data, e)) => (data, Err(e))
+            Err((data, e)) => (data, Err(e)),
         }
     }
 }

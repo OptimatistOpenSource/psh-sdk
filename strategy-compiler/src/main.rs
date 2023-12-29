@@ -24,7 +24,7 @@ fn main() {
             wasm_path: None,
             output_path: Some(output_path),
         } => {
-            println!("  {}", "Compiling".green().bold());
+            println!("  {} ({})", "Compiling".green().bold(), &project_dir);
             println!("    {} Cargo building...", "*".green());
             let cargo_toml_path = format!("{}/Cargo.toml", project_dir);
             let mut cargo_build = {
@@ -61,7 +61,7 @@ fn main() {
             wasm_path: Some(wasm_path),
             output_path: Some(output_path),
         } => {
-            println!("  {}", "Compiling".green().bold());
+            println!("  {} ({})", "Compiling".green().bold(), &wasm_path);
             println!("    {} AOT compiling...", "*".green());
             let precompiled = precompile_wasm(wasm_path);
             println!("    {} Writing binary...", "*".green());

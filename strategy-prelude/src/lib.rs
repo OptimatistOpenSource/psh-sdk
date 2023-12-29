@@ -3,5 +3,5 @@
 
 extern crate alloc;
 
-pub mod op;
 mod intrinsics;
+pub mod op;

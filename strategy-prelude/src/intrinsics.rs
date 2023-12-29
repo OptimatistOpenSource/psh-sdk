@@ -14,22 +14,3 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 
     loop {}
 }
-
-/*pub(crate) struct Stub;
-
-impl crate::op::bindings::Guest for Stub {
-    #[inline]
-    fn main() {
-        unsafe {}
-    }
-
-    #[inline]
-    fn alloc(size: u32, align: u32) -> u32 {
-        use alloc::alloc::alloc;
-        use core::alloc::Layout;
-
-        let layout = Layout::from_size_align(size as _, align as _).unwrap();
-        let ptr = unsafe { alloc(layout) };
-        ptr as _
-    }
-}*/

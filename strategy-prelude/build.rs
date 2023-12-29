@@ -5,12 +5,7 @@ use std::process::Command;
 fn main() {
     let _ = fs::remove_file("src/op/bindings.rs");
     let mut cmd = Command::new("wit-bindgen");
-    cmd.args([
-        "rust",
-        "--out-dir",
-        "src/op",
-        "./wit/strategy.wit",
-    ]);
+    cmd.args(["rust", "--out-dir", "src/op", "./wit/strategy.wit"]);
 
     let output = cmd
         .output()

@@ -25,5 +25,20 @@ world bindings {
             contents-ptr: u32,
             contents-len: u32
         );
+        file-remove-file: func(
+            ret-area-ptr: u32,
+            path-ptr: u32,
+            path-len: u32,
+        );
+        file-create-dir: func(
+            ret-area-ptr: u32,
+            path-ptr: u32,
+            path-len: u32,
+        );
+        file-remove-dir: func(
+            ret-area-ptr: u32,
+            path-ptr: u32,
+            path-len: u32,
+        );
     }
 }

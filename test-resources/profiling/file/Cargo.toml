@@ -1,0 +1,16 @@
+[package]
+name = "profiling-test-file"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+name = "profiling"
+crate-type = ["cdylib"]
+
+#[profile.release]
+#lto = true
+#strip = true
+#codegen-units = 1
+
+[dependencies]
+profiling = { path = "../../..", features = ["profiling-dev"] }

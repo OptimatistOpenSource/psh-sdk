@@ -1,4 +1,4 @@
-package profiling:strategy;
+package profiling:profiling;
 
 world bindings {
     import op: interface {

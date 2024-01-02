@@ -1,6 +1,6 @@
+use crate::op::test::{compile_profiling, gen_engine};
 use crate::profiling::Profiling;
 use std::fs;
-use crate::op::test::{compile_profiling, gen_engine};
 
 #[test]
 fn test_file() {

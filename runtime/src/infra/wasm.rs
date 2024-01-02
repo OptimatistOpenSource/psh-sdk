@@ -1,7 +1,7 @@
 use std::slice;
 use wasmtime::{AsContext, AsContextMut, Caller, Memory, Val};
 
-pub unsafe fn get_mem<T>(caller: &mut Caller<T>) -> Memory {
+pub fn get_mem<T>(caller: &mut Caller<T>) -> Memory {
     caller.get_export("memory").unwrap().into_memory().unwrap()
 }
 

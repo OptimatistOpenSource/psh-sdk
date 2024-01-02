@@ -1,6 +1,6 @@
+use crate::op::test::{compile_profiling, gen_engine};
 use crate::profiling::Profiling;
 use std::fs;
-use crate::op::test::{compile_profiling, gen_engine};
 
 #[test]
 fn test_exit() {
@@ -41,5 +41,8 @@ fn test_panic() {
     assert!(r.is_err());
     assert_eq!(logs.len(), 2);
     assert_eq!(logs[0], "0");
-    assert_eq!(logs[1], "profiling panic: panicked at src/lib.rs:6:1:\noops");
+    assert_eq!(
+        logs[1],
+        "profiling panic: panicked at src/lib.rs:6:1:\noops"
+    );
 }

@@ -1,6 +1,6 @@
 use crate::infra::wasm::get_str;
 use crate::op;
-use crate::profiling::engine::Data;
+use crate::profiling::runtime::Data;
 use wasmtime::Caller;
 
 pub fn log(mut caller: Caller<Data>, info_vm_ptr: u32, info_len: u32) {

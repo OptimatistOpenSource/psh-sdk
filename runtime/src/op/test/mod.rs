@@ -1,6 +1,6 @@
-use std::process::Command;
 use crate::op;
-use crate::profiling::engine::ProfilingEngine;
+use crate::profiling::runtime::ProfilingEngine;
+use std::process::Command;
 
 mod file;
 mod intrinsics;
@@ -33,12 +33,7 @@ pub fn gen_engine() -> ProfilingEngine {
 fn compile_paot() {
     let mut cargo_build_paot = {
         let mut cmd = Command::new("cargo");
-        cmd.args([
-            "build",
-            "--release",
-            "--manifest-path",
-            "../aot/Cargo.toml",
-        ]);
+        cmd.args(["build", "--release", "--manifest-path", "../aot/Cargo.toml"]);
         cmd
     };
     let output = cargo_build_paot.output().unwrap();

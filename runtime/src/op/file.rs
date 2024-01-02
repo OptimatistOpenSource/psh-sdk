@@ -1,6 +1,6 @@
 use crate::infra::wasm::{copy_to_vm, get_str, to_host_ptr};
 use crate::op;
-use crate::profiling::engine::Data;
+use crate::profiling::runtime::Data;
 use wasmtime::Caller;
 
 pub fn is_exist(mut caller: Caller<Data>, path_vm_ptr: u32, path_len: u32) -> u32 {

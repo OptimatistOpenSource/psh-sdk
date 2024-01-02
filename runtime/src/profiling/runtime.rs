@@ -1,20 +1,20 @@
 use std::borrow::Borrow;
 use std::collections::VecDeque;
 
-use anyhow::{Context, Result};
-use wasmtime::{Config, Engine, IntoFunc, Linker, Module, Store, Trap};
+use anyhow::Result;
+use wasmtime::{Config, Engine, IntoFunc, Linker, Module, Store};
 
 use crate::profiling::Profiling;
 
 pub type Data = VecDeque<String>;
 
-pub struct ProfilingEngine {
+pub struct ProfilingRuntime {
     pub(crate) wasm_engine: Box<Engine>,
     pub(crate) wasm_linker: Linker<Data>,
 }
 
-impl ProfilingEngine {
-    pub fn new() -> Self {
+impl Default for ProfilingRuntime {
+    fn default() -> Self {
         let wasm_engine = {
             let mut cfg = Config::new();
             cfg.epoch_interruption(true);
@@ -25,6 +25,12 @@ impl ProfilingEngine {
             wasm_linker: Linker::new(wasm_engine.as_ref()),
             wasm_engine,
         }
+    }
+}
+
+impl ProfilingRuntime {
+    pub fn new() -> Self {
+        ProfilingRuntime::default()
     }
 
     pub fn precompile_profiling(&self, profiling: Profiling) -> Result<Profiling> {
@@ -48,7 +54,10 @@ impl ProfilingEngine {
         TODO: Refactor with try block
         Waiting for feature: https://github.com/rust-lang/rust/issues/31436
         */
-        fn inner(se: &ProfilingEngine, profiling: &Profiling) -> Result<Data, (Data, anyhow::Error)> {
+        fn inner(
+            se: &ProfilingRuntime,
+            profiling: &Profiling,
+        ) -> Result<Data, (Data, anyhow::Error)> {
             let wasm_module = if profiling.is_aot {
                 unsafe { Module::deserialize(&se.wasm_engine, &profiling.bytes) }
             } else {

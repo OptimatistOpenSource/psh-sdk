@@ -1,4 +1,4 @@
-use crate::op::test::{compile_profiling, gen_engine};
+use crate::op::tests::{compile_profiling, gen_engine};
 use crate::profiling::Profiling;
 use std::fs;
 
@@ -14,10 +14,6 @@ fn test_file() {
     let _ = fs::create_dir(tmp_dir);
 
     let (logs, r) = engine.run_profiling(profiling);
-    //assert!(r.is_ok());
-    //r.unwrap();
-    //assert_eq!(logs.len(), 0);
-    for log in logs {
-        println!("{}", log);
-    }
+    assert!(r.is_ok());
+    assert_eq!(logs.len(), 0);
 }

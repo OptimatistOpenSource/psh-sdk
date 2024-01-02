@@ -1,4 +1,4 @@
-use crate::op::test::{compile_profiling, gen_engine};
+use crate::op::tests::{compile_profiling, gen_engine};
 use crate::profiling::Profiling;
 use std::fs;
 

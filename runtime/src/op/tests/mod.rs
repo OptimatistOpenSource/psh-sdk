@@ -1,13 +1,13 @@
 use crate::op;
-use crate::profiling::runtime::ProfilingEngine;
+use crate::profiling::runtime::ProfilingRuntime;
 use std::process::Command;
 
 mod file;
 mod intrinsics;
 mod perf;
 
-pub fn gen_engine() -> ProfilingEngine {
-    let mut engine = ProfilingEngine::new();
+pub fn gen_engine() -> ProfilingRuntime {
+    let mut engine = ProfilingRuntime::new();
     engine
         .link_op("log", op::log)
         .unwrap()

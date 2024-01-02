@@ -3,6 +3,6 @@ pub mod intrinsics;
 pub mod perf;
 mod raw;
 #[cfg(test)]
-mod test;
+mod tests;
 
 pub use intrinsics::*;

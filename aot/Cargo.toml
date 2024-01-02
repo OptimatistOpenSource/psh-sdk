@@ -1,16 +1,16 @@
 [package]
-name = "strategy-compiler"
+name = "profiling-aot"
 version = "0.0.0"
 edition = "2021"
 
 [[bin]]
-name = "sc"
+name = "paot"
 path = "src/main.rs"
 
-[profile.release]
-lto = true
-strip = true
-codegen-units = 1
+#[profile.release]
+#lto = true
+#strip = true
+#codegen-units = 1
 
 [dependencies]
 anyhow = "1.0.75"

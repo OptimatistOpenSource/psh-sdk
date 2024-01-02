@@ -4,16 +4,16 @@ use clap::Parser;
 #[command(author, about, long_about = None, version)]
 pub struct Args {
     #[arg(verbatim_doc_comment)]
-    /// Path to your strategy project
-    ///   Example: sc -p strategy-template -o strategy
+    /// Path to your profiling project
+    ///   Example: paot -p profiling-template -o profiling
     #[arg(long)]
     #[clap(short = 'p')]
     #[arg(value_name = "PATH")]
     pub project_dir: Option<String>,
 
     #[arg(verbatim_doc_comment)]
-    /// Path to your strategy.wasm
-    ///   Example: sc -w strategy.wasm -o strategy
+    /// Path to your profiling.wasm
+    ///   Example: paot -w profiling.wasm -o profiling
     #[arg(long)]
     #[clap(short = 'w')]
     #[arg(value_name = "PATH")]
@@ -21,10 +21,10 @@ pub struct Args {
 
     #[arg(verbatim_doc_comment)]
     /// Where you want to place your compilation result
-    ///   Example: sc -p strategy-template -o strategy
+    ///   Example: paot -p profiling-template -o profiling
     #[arg(long)]
     #[clap(short = 'o')]
-    #[arg(default_value = "strategy")]
+    #[arg(default_value = "profiling")]
     #[arg(value_name = "PATH")]
     pub output_path: Option<String>,
 }

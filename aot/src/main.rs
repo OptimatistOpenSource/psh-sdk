@@ -39,10 +39,13 @@ fn main() {
                 ]);
                 cmd
             };
-            cargo_build.output().unwrap();
+            let cargo_build_output = cargo_build.output().unwrap();
+            if cargo_build_output.stderr.len() != 0 {
+                println!("{}", String::from_utf8(cargo_build_output.stderr).unwrap());
+            }
 
             let wasm_path = format!(
-                "{}/target/wasm32-unknown-unknown/release/strategy.wasm",
+                "{}/target/wasm32-unknown-unknown/release/profiling.wasm",
                 project_dir
             );
             println!("    {} AOT compiling...", "*".green());
@@ -51,7 +54,7 @@ fn main() {
             fs::write(&output_path, precompiled).unwrap();
             println!("  {}", "Finished".green().bold());
             println!(
-                "    {} Strategy was located in {}",
+                "    {} Profiling was located in {}",
                 "*".green(),
                 output_path.green().bold()
             );
@@ -68,7 +71,7 @@ fn main() {
             fs::write(&output_path, precompiled).unwrap();
             println!("  {}", "Finished".green().bold());
             println!(
-                "    {} Strategy was located in {}",
+                "    {} Profiling was located in {}",
                 "*".green(),
                 output_path.green().bold()
             );

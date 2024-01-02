@@ -721,6 +721,40 @@ dependencies = [
 ]
 
 [[package]]
+name = "profiling"
+version = "0.1.0"
+dependencies = [
+ "profiling-macros",
+ "profiling-prelude",
+]
+
+[[package]]
+name = "profiling-macros"
+version = "0.0.0"
+dependencies = [
+ "proc-macro2",
+ "syn",
+]
+
+[[package]]
+name = "profiling-prelude"
+version = "0.0.0"
+dependencies = [
+ "wasm-bindgen",
+ "wee_alloc",
+ "wit-bindgen",
+]
+
+[[package]]
+name = "profiling-runtime"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "bson",
+ "wasmtime",
+]
+
+[[package]]
 name = "psm"
 version = "0.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -948,40 +982,6 @@ name = "stable_deref_trait"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
-
-[[package]]
-name = "strategy"
-version = "0.1.0"
-dependencies = [
- "strategy-macros",
- "strategy-prelude",
-]
-
-[[package]]
-name = "strategy-macros"
-version = "0.0.0"
-dependencies = [
- "proc-macro2",
- "syn",
-]
-
-[[package]]
-name = "strategy-prelude"
-version = "0.0.0"
-dependencies = [
- "wasm-bindgen",
- "wee_alloc",
- "wit-bindgen",
-]
-
-[[package]]
-name = "strategy-runtime"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "bson",
- "wasmtime",
-]
 
 [[package]]
 name = "syn"

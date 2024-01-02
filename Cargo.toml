@@ -1,24 +1,24 @@
 [package]
-name = "strategy"
+name = "profiling"
 version = "0.1.0"
 edition = "2021"
 
 [workspace]
 members = [
-    "strategy-macros",
-    "strategy-prelude",
-    "strategy-runtime",
+    "macros",
+    "prelude",
+    "runtime",
 ]
 exclude = [
-    "strategy-compiler",
-    "strategy-template",
+    "aot",
+    "docs",
     "test-resources",
 ]
 
 [features]
-strategy-dev = ["strategy-macros", "strategy-prelude"]
-strategy-macros = []
-strategy-prelude = []
+profiling-dev = ["profiling-macros", "profiling-prelude"]
+profiling-macros = []
+profiling-prelude = []
 
 #[profile.release]
 #lto = true
@@ -26,5 +26,5 @@ strategy-prelude = []
 #codegen-units = 1
 
 [dependencies]
-strategy-macros = { path = "./strategy-macros" }
-strategy-prelude = { path = "./strategy-prelude" }
+profiling-macros = { path =  "./macros" }
+profiling-prelude = { path = "./prelude" }

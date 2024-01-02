@@ -1,6 +1,6 @@
-#![cfg_attr(feature = "strategy-dev", no_std)]
+#![cfg_attr(feature = "profiling-dev", no_std)]
 
-#[cfg(feature = "strategy-macros")]
-pub use strategy_macros::*;
-#[cfg(feature = "strategy-prelude")]
-pub use strategy_prelude::*;
+#[cfg(feature = "profiling-macros")]
+pub use profiling_macros::*;
+#[cfg(feature = "profiling-prelude")]
+pub use profiling_prelude::*;

@@ -6,7 +6,7 @@ pub fn get_mem<T>(caller: &mut Caller<T>) -> Memory {
 }
 
 pub unsafe fn vm_alloc<T>(caller: &mut Caller<T>, size: u32, align: u32) -> u32 {
-    // alloc: u32 -> u32
+    // alloc: u32 -> u32 -> u32
     let alloc = caller.get_export("alloc").unwrap().into_func().unwrap();
     let params = [Val::I32(size as _), Val::I32(align as _)];
     let mut results = [Val::I32(0)];
@@ -14,6 +14,19 @@ pub unsafe fn vm_alloc<T>(caller: &mut Caller<T>, size: u32, align: u32) -> u32 
         .call(caller.as_context_mut(), &params, &mut results)
         .unwrap();
     results[0].i32().unwrap() as _
+}
+
+pub unsafe fn vm_dealloc<T>(caller: &mut Caller<T>, vm_ptr: u32, size: u32, align: u32) {
+    // dealloc: u32 -> u32 -> u32 -> ()
+    let dealloc = caller.get_export("dealloc").unwrap().into_func().unwrap();
+    let params = [
+        Val::I32(vm_ptr as _),
+        Val::I32(size as _),
+        Val::I32(align as _),
+    ];
+    dealloc
+        .call(caller.as_context_mut(), &params, &mut [])
+        .unwrap();
 }
 
 pub unsafe fn to_host_ptr<T>(caller: &mut Caller<T>, vm_ptr: u32) -> *mut u8 {

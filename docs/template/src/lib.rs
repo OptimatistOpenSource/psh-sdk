@@ -1,9 +1,9 @@
 #![cfg(target_arch = "wasm32")]
 #![no_std]
 
-use strategy::op;
+use profiling::op;
 
-#[strategy::main]
+#[profiling::main]
 fn main() {
     op::log("Hello world!");
 }

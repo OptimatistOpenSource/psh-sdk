@@ -183,7 +183,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "strategy-macros"
+name = "profiling-macros"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",
@@ -191,7 +191,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "strategy-prelude"
+name = "profiling-prelude"
 version = "0.0.0"
 dependencies = [
  "wasm-bindgen",
@@ -200,11 +200,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "strategy-template"
+name = "profiling-template"
 version = "0.1.0"
 dependencies = [
- "strategy-macros",
- "strategy-prelude",
+ "profiling-macros",
+ "profiling-prelude",
 ]
 
 [[package]]

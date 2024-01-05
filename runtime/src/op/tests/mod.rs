@@ -16,6 +16,8 @@ pub fn gen_engine() -> ProfilingRuntime {
         .unwrap()
         .link_op("exit", op::exit)
         .unwrap()
+        .link_op("drop-resource", op::drop_resource)
+        .unwrap()
         // file ops
         .link_op("file-is-exist", op::file::is_exist)
         .unwrap()
@@ -30,6 +32,15 @@ pub fn gen_engine() -> ProfilingRuntime {
         .link_op("file-create-dir", op::file::create_dir)
         .unwrap()
         .link_op("file-remove-dir", op::file::remove_dir)
+        .unwrap()
+        // perf ops
+        .link_op("perf-new-counter", op::perf::new_counter)
+        .unwrap()
+        .link_op("perf-enable-counter", op::perf::enable_counter)
+        .unwrap()
+        .link_op("perf-disable-counter", op::perf::disable_counter)
+        .unwrap()
+        .link_op("perf-get-counter-result", op::perf::get_counter_result)
         .unwrap();
     engine
 }

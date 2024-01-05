@@ -5,7 +5,7 @@ macro_rules! print {
     };
     ($($arg:tt)*) => {{
         use alloc::format;
-        crate::op::log_err(format!("{}", format_args!($($arg)*)));
+        crate::op::log(format!("{}", format_args!($($arg)*)));
     }};
 }
 

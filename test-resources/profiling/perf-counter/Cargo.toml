@@ -13,6 +13,4 @@ strip = true
 codegen-units = 1
 
 [dependencies]
-#profiling = { path = "../../..", features = ["profiling-dev"] }
-profiling-macros = { path = "../../../macros" }
-profiling-prelude = { path = "../../../prelude" }
+profiling = { path = "../../..", features = ["profiling-dev"] }

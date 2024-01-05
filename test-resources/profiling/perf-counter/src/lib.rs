@@ -3,13 +3,10 @@
 
 extern crate alloc;
 
-use crate::alloc::string::ToString;
-//use profiling::op;
+use profiling::op;
+use profiling::println;
 
-use profiling_prelude::op;
-
-//#[profiling::main]
-#[profiling_macros::main]
+#[profiling::main]
 fn main() {
     let cfg = op::perf::CounterConfig {
         calling_process: true,
@@ -27,9 +24,9 @@ fn main() {
 
     let result = counter.get_result().unwrap();
 
-    op::log(result.event_count.to_string());
-    op::log(result.time_enabled.to_string());
-    op::log(result.time_running.to_string());
+    println!("event_count: {}",  result.event_count);
+    println!("time_enabled: {}", result.time_enabled);
+    println!("time_running: {}", result.time_running);
     assert!(result.event_count > 0);
     assert!(result.time_enabled > 0);
     assert!(result.time_running > 0);

@@ -13,7 +13,7 @@ fn test_counter() {
     assert!(r.is_ok());
     let out = data.output_log();
     for log in out {
-        println!("{}", log);
+        print!("{}", log);
     }
     let err = data.error_log();
     assert_eq!(err.len(), 0);

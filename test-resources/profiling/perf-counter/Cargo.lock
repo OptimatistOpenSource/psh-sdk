@@ -116,6 +116,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "profiling"
+version = "0.1.0"
+dependencies = [
+ "profiling-macros",
+ "profiling-prelude",
+]
+
+[[package]]
 name = "profiling-macros"
 version = "0.0.0"
 dependencies = [
@@ -136,8 +144,7 @@ dependencies = [
 name = "profiling-test-perf-counter"
 version = "0.0.0"
 dependencies = [
- "profiling-macros",
- "profiling-prelude",
+ "profiling",
 ]
 
 [[package]]

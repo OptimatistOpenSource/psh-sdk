@@ -1,12 +1,13 @@
+mod data;
+
 use std::borrow::Borrow;
-use std::collections::VecDeque;
+
+pub use data::*;
 
 use anyhow::Result;
 use wasmtime::{Config, Engine, IntoFunc, Linker, Module, Store};
 
 use crate::profiling::Profiling;
-
-pub type Data = VecDeque<String>;
 
 pub struct ProfilingRuntime {
     pub(crate) wasm_engine: Box<Engine>,
@@ -15,6 +16,12 @@ pub struct ProfilingRuntime {
 
 impl Default for ProfilingRuntime {
     fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl ProfilingRuntime {
+    pub fn new() -> Self {
         let wasm_engine = {
             let mut cfg = Config::new();
             cfg.epoch_interruption(true);
@@ -25,12 +32,6 @@ impl Default for ProfilingRuntime {
             wasm_linker: Linker::new(wasm_engine.as_ref()),
             wasm_engine,
         }
-    }
-}
-
-impl ProfilingRuntime {
-    pub fn new() -> Self {
-        ProfilingRuntime::default()
     }
 
     pub fn precompile_profiling(&self, profiling: Profiling) -> Result<Profiling> {

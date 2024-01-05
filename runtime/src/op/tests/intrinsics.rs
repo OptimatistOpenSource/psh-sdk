@@ -9,10 +9,13 @@ fn test_exit() {
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
     let engine = gen_engine();
 
-    let (logs, r) = engine.run_profiling(profiling);
+    let (data, r) = engine.run_profiling(profiling);
     assert!(r.is_err());
-    assert_eq!(logs.len(), 1);
-    assert_eq!(logs[0], "0");
+    let out = data.output_log();
+    assert_eq!(out.len(), 1);
+    assert_eq!(out[0], "0");
+    let err = data.error_log();
+    assert_eq!(err.len(), 0);
 }
 
 #[test]
@@ -22,12 +25,15 @@ fn test_log() {
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
     let engine = gen_engine();
 
-    let (logs, r) = engine.run_profiling(profiling);
+    let (data, r) = engine.run_profiling(profiling);
     assert!(r.is_ok());
-    assert_eq!(logs.len(), 3);
-    assert_eq!(logs[0], "0");
-    assert_eq!(logs[1], "1");
-    assert_eq!(logs[2], "2");
+    let out = data.output_log();
+    assert_eq!(out.len(), 3);
+    assert_eq!(out[0], "0");
+    assert_eq!(out[1], "1");
+    assert_eq!(out[2], "2");
+    let err = data.error_log();
+    assert_eq!(err.len(), 0);
 }
 
 #[test]
@@ -37,12 +43,12 @@ fn test_panic() {
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
     let engine = gen_engine();
 
-    let (logs, r) = engine.run_profiling(profiling);
+    let (data, r) = engine.run_profiling(profiling);
     assert!(r.is_err());
-    assert_eq!(logs.len(), 2);
-    assert_eq!(logs[0], "0");
-    assert_eq!(
-        logs[1],
-        "profiling panic: panicked at src/lib.rs:6:1:\noops"
-    );
+    let out = data.output_log();
+    assert_eq!(out.len(), 1);
+    assert_eq!(out[0], "0");
+    let err = data.error_log();
+    assert_eq!(err.len(), 1);
+    assert_eq!(err[0], "profiling panic: panicked at src/lib.rs:6:1:\noops");
 }

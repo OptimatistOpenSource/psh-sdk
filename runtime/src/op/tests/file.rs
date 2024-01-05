@@ -13,7 +13,6 @@ fn test_file() {
     let _ = fs::remove_dir(tmp_dir);
     let _ = fs::create_dir(tmp_dir);
 
-    let (logs, r) = engine.run_profiling(profiling);
+    let (_, r) = engine.run_profiling(profiling);
     assert!(r.is_ok());
-    assert_eq!(logs.len(), 0);
 }

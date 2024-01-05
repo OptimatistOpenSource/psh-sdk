@@ -9,10 +9,14 @@ mod perf;
 pub fn gen_engine() -> ProfilingRuntime {
     let mut engine = ProfilingRuntime::new();
     engine
+        // intrinsics ops
         .link_op("log", op::log)
+        .unwrap()
+        .link_op("log-err", op::log_err)
         .unwrap()
         .link_op("exit", op::exit)
         .unwrap()
+        // file ops
         .link_op("file-is-exist", op::file::is_exist)
         .unwrap()
         .link_op("file-read", op::file::read)

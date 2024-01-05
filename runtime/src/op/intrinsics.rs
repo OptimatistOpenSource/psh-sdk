@@ -16,7 +16,7 @@ pub fn log_err(mut caller: Caller<Data>, info_vm_ptr: u32, info_len: u32) {
     let caller = &mut caller;
     unsafe {
         let info = get_str(caller, info_vm_ptr, info_len).to_string();
-        let err = caller.data_mut().output_log_mut();
+        let err = caller.data_mut().error_log_mut();
 
         err.push_back(info);
     }

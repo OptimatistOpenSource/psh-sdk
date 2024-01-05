@@ -20,10 +20,10 @@ pub fn exit() {
     bindings::op::exit()
 }
 
-pub fn drop_resource(id: u32) -> bool {
-    match bindings::op::drop_resource(id) {
-        0 => true,
-        1 => false,
+pub fn drop_resource(rid: u32) {
+    match bindings::op::drop_resource(rid) {
+        1 => (),
+        0 => panic!("Failed to drop drop resource (rid: {})", rid),
         _ => unreachable!(),
     }
 }

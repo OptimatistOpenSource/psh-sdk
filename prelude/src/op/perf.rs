@@ -94,8 +94,6 @@ impl Counter {
 
 impl Drop for Counter {
     fn drop(&mut self) {
-        if !crate::op::drop_resource(self.rid) {
-            panic!("Failed to drop Counter {}", self.rid)
-        }
+        crate::op::drop_resource(self.rid)
     }
 }

@@ -5,6 +5,7 @@ world bindings {
         log: func(info-ptr: u32, info-len: u32);
         log-err: func(info-ptr: u32, info-len: u32);
         exit: func();
+        drop-resource: func(id: u32) -> u32;
 
         file-is-exist: func(path-ptr: u32, path-len: u32) -> u32;
         file-read: func(
@@ -40,6 +41,24 @@ world bindings {
             ret-area-ptr: u32,
             path-ptr: u32,
             path-len: u32,
+        );
+
+        perf-new-counter: func(
+            ret-area-ptr: u32,
+            serialized-cfg-ptr: u32,
+            serialized-cfg-len: u32,
+        );
+        perf-enable-counter: func(
+            ret-area-ptr: u32,
+            counter-rid: u32
+        );
+        perf-disable-counter: func(
+            ret-area-ptr: u32,
+            counter-rid: u32
+        );
+        perf-get-counter-result: func(
+            ret-area-ptr: u32,
+            counter-rid: u32
         );
     }
 }

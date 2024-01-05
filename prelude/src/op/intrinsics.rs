@@ -1,7 +1,6 @@
 use crate::op::bindings;
 use core::borrow::Borrow;
 
-#[inline]
 pub fn log(info: impl Borrow<str>) {
     let info = info.borrow();
     let info_ptr = info.as_ptr();
@@ -9,7 +8,6 @@ pub fn log(info: impl Borrow<str>) {
     bindings::op::log(info_ptr as _, info_len as _)
 }
 
-#[inline]
 pub fn log_err(info: impl Borrow<str>) {
     let info = info.borrow();
     let info_ptr = info.as_ptr();
@@ -20,4 +18,12 @@ pub fn log_err(info: impl Borrow<str>) {
 #[inline]
 pub fn exit() {
     bindings::op::exit()
+}
+
+pub fn drop_resource(id: u32) -> bool {
+    match bindings::op::drop_resource(id) {
+        0 => true,
+        1 => false,
+        _ => unreachable!(),
+    }
 }

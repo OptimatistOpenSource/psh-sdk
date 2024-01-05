@@ -3,6 +3,7 @@ package profiling:profiling;
 world bindings {
     import op: interface {
         log: func(info-ptr: u32, info-len: u32);
+        log-err: func(info-ptr: u32, info-len: u32);
         exit: func();
 
         file-is-exist: func(path-ptr: u32, path-len: u32) -> u32;

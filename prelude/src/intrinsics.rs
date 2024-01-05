@@ -12,7 +12,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     use alloc::string::ToString;
 
     let info = format!("profiling panic: {}", info.to_string());
-    op::log(info);
+    op::log_err(info);
     op::exit();
 
     loop {}

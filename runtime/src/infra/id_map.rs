@@ -1,6 +1,7 @@
 use std::collections::{BTreeSet, HashMap};
 
 // TODO: can be optimized
+#[derive(Debug)]
 pub struct IdMap<T> {
     ids: BTreeSet<u32>,
     map: HashMap<u32, T>,
@@ -18,8 +19,11 @@ impl<T> IdMap<T> {
     }
 
     pub fn insert(&mut self, val: T) -> u32 {
-        let max_id = self.ids.iter().next_back().unwrap_or(&0);
-        let id = max_id + 1;
+        let id = match self.ids.iter().next_back() {
+            None => 0,
+            Some(max_id) => max_id + 1,
+        };
+        self.ids.insert(id);
         self.map.insert(id, val);
         id
     }
@@ -33,6 +37,8 @@ impl<T> IdMap<T> {
     }
 
     pub fn remove(&mut self, id: u32) -> Option<T> {
-        self.map.remove(&id)
+        let val = self.map.remove(&id);
+        self.ids.remove(&id);
+        val
     }
 }

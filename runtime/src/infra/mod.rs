@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-pub mod wasm;
 mod id_map;
+pub mod wasm;
 
 pub use id_map::*;

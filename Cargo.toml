@@ -6,8 +6,9 @@ edition = "2021"
 [workspace]
 members = [
     "macros",
-    "prelude",
     "runtime",
+    "prelude",
+    "prelude/include/*",
 ]
 exclude = [
     "aot",

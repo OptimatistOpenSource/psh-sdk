@@ -1,0 +1,10 @@
+[package]
+name = "profiling-prelude-file"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+wit-bindgen = "0.16.0"
+
+[build-dependencies]
+wit-bindgen = "0.16.0"

@@ -1,4 +1,4 @@
-use crate::op::bindings;
+use crate::bindings;
 use core::borrow::Borrow;
 
 pub fn log(info: impl Borrow<str>) {
@@ -26,4 +26,13 @@ pub fn drop_resource(rid: u32) {
         0 => panic!("Failed to drop drop resource (rid: {})", rid),
         _ => unreachable!(),
     }
+}
+
+#[panic_handler]
+fn panic_handler(info: &core::panic::PanicInfo) -> ! {
+    let info = alloc::format!("Profiling panic: \n{}", info);
+    log_err(info);
+    exit();
+
+    loop {}
 }

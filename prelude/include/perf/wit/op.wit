@@ -1,0 +1,23 @@
+package profiling:profiling;
+
+world bindings {
+    import op: interface {
+        perf-new-counter: func(
+            ret-area-ptr: u32,
+            serialized-cfg-ptr: u32,
+            serialized-cfg-len: u32,
+        );
+        perf-enable-counter: func(
+            ret-area-ptr: u32,
+            counter-rid: u32
+        );
+        perf-disable-counter: func(
+            ret-area-ptr: u32,
+            counter-rid: u32
+        );
+        perf-get-counter-result: func(
+            ret-area-ptr: u32,
+            counter-rid: u32
+        );
+    }
+}

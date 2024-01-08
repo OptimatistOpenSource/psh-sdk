@@ -4,7 +4,7 @@
 extern crate alloc;
 
 use core::ops::Not;
-use profiling::op;
+use profiling::file;
 
 #[profiling::main]
 fn main() {
@@ -16,9 +16,9 @@ fn main() {
         op::file::append
         op::file::read
     */
-    op::file::write (file_path, "0").unwrap();
-    op::file::append(file_path, "1").unwrap();
-    let contents = op::file::read(file_path).unwrap();
+    file::write (file_path, "0").unwrap();
+    file::append(file_path, "1").unwrap();
+    let contents = file::read(file_path).unwrap();
     assert_eq!(contents, "01");
 
     /*
@@ -26,10 +26,10 @@ fn main() {
         op::file::is_exist
         op::file::remove_file
     */
-    let is_exist = op::file::is_exist(file_path);
+    let is_exist = file::is_exist(file_path);
     assert!(is_exist);
-    op::file::remove_file(file_path).unwrap();
-    let is_exist = op::file::is_exist(file_path);
+    file::remove_file(file_path).unwrap();
+    let is_exist = file::is_exist(file_path);
     assert!(is_exist.not());
 
     /*
@@ -38,10 +38,10 @@ fn main() {
         op::file::create_dir
         op::file::remove_dir
     */
-    op::file::create_dir(file_path).unwrap();
-    let is_exist = op::file::is_exist(file_path);
+    file::create_dir(file_path).unwrap();
+    let is_exist = file::is_exist(file_path);
     assert!(is_exist);
-    op::file::remove_dir(file_path).unwrap();
-    let is_exist = op::file::is_exist(file_path);
+    file::remove_dir(file_path).unwrap();
+    let is_exist = file::is_exist(file_path);
     assert!(is_exist.not());
 }

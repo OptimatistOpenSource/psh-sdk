@@ -1,9 +1,6 @@
 #![no_std]
 #![cfg(target_arch = "wasm32")]
 
-#[allow(unused_imports)]
-use profiling_prelude_intrinsics as intrinsics;
-
 #[macro_export]
 macro_rules! print {
     () => {

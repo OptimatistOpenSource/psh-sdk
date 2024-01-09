@@ -6,7 +6,8 @@ edition = "2021"
 [dependencies]
 wee_alloc = "0.4.5"
 
-profiling-prelude-intrinsics = { path = "include/intrinsics"}
-profiling-prelude-macros = { path = "include/macros"}
-profiling-prelude-file = { path = "include/file"}
-profiling-prelude-perf = { path = "include/perf"}
+profiling-prelude-file = { path = "include/file" }
+profiling-prelude-intrinsics = { path = "include/intrinsics" }
+profiling-prelude-macros = { path = "include/macros" }
+profiling-prelude-perf = { path = "include/perf" }
+profiling-prelude-proc-macros = { path = "include/proc-macros" }

@@ -1,7 +1,8 @@
 #![cfg(target_arch = "wasm32")]
 #![no_std]
 
-use profiling::intrinsics;
+use profiling::prelude;
+use prelude::intrinsics;
 
 #[profiling::main]
 fn main() {

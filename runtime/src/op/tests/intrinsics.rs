@@ -52,6 +52,6 @@ fn test_panic() {
     assert_eq!(err.len(), 1);
     assert_eq!(
         err[0],
-        "Profiling panic: \npanicked at src/lib.rs:6:1:\noops"
+        "Profiling panic: \npanicked at src/lib.rs:7:1:\noops"
     );
 }

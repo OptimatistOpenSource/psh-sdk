@@ -4,7 +4,8 @@
 extern crate alloc;
 
 use core::ops::Not;
-use profiling::file;
+use profiling::prelude;
+use prelude::file;
 
 #[profiling::main]
 fn main() {

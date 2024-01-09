@@ -1,43 +1,46 @@
+#![no_std]
+#![cfg(target_arch = "wasm32")]
+
 #[macro_export]
 macro_rules! print {
     () => {
-        crate::op::log("")
+        intrinsics::log("")
     };
     ($($arg:tt)*) => {{
         use alloc::format;
-        crate::op::log(format!("{}", format_args!($($arg)*)));
+        intrinsics::log(format!("{}", format_args!($($arg)*)));
     }};
 }
 
 #[macro_export]
 macro_rules! println {
     () => {
-        crate::op::log("\n")
+        intrinsics::log("\n")
     };
     ($($arg:tt)*) => {{
         use alloc::format;
-        crate::op::log(format!("{}\n", format_args!($($arg)*)));
+        intrinsics::log(format!("{}\n", format_args!($($arg)*)));
     }};
 }
 
 #[macro_export]
 macro_rules! eprint {
     () => {
-        crate::op::log_err("")
+        intrinsics::log_err("")
     };
     ($($arg:tt)*) => {{
         use alloc::format;
-        crate::op::log_err(format!("{}", format_args!($($arg)*)));
+        intrinsics::log_err(format!("{}", format_args!($($arg)*)));
     }};
 }
 
 #[macro_export]
 macro_rules! eprintln {
     () => {
-        crate::op::log_err("\n")
+        intrinsics::log_err("\n")
     };
     ($($arg:tt)*) => {{
         use alloc::format;
-        crate::op::log_err(format!("{}\n", format_args!($($arg)*)));
+        intrinsics::log_err(format!("{}\n", format_args!($($arg)*)));
     }};
 }

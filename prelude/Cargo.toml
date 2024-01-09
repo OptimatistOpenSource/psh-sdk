@@ -4,9 +4,10 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-wit-bindgen = "0.16.0"
 wee_alloc = "0.4.5"
 
-[build-dependencies]
-wit-bindgen = "0.16.0"
-wasm-bindgen = "0.2.89"
+profiling-prelude-file = { path = "include/file" }
+profiling-prelude-intrinsics = { path = "include/intrinsics" }
+profiling-prelude-macros = { path = "include/macros" }
+profiling-prelude-perf = { path = "include/perf" }
+profiling-prelude-proc-macros = { path = "include/proc-macros" }

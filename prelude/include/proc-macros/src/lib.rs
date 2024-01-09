@@ -1,24 +1,25 @@
 #![crate_type = "proc-macro"]
 
 use proc_macro::TokenStream;
-use syn::__private::ToTokens;
 
 #[proc_macro_attribute]
-pub fn main(_: TokenStream, ts: TokenStream) -> TokenStream {
+pub fn main(_: TokenStream, mut ts: TokenStream) -> TokenStream {
     let main_fn = syn::parse::<syn::ItemFn>(ts.clone())
         .expect("`#[profiling::main]` can only be applied to fn item");
 
-    let trait_impl = format!(
+    let export_main = format!(
         r#"
         const _: () = {{
             #[export_name = "main"]
-            unsafe extern "C" fn main() {{
-                {}
+            unsafe extern "C" fn __export_main() {{
+                {}()
             }}
         }};
         "#,
-        main_fn.block.to_token_stream()
+        main_fn.sig.ident
     );
+    let export_main = export_main.parse::<TokenStream>().unwrap();
 
-    trait_impl.parse::<TokenStream>().unwrap()
+    ts.extend(export_main);
+    ts
 }

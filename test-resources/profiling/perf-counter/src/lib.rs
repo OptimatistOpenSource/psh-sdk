@@ -3,12 +3,14 @@
 
 extern crate alloc;
 
-use profiling::op;
-use profiling::println;
+use profiling::prelude;
+use prelude::intrinsics;
+use prelude::macros::*;
+use prelude::perf;
 
 #[profiling::main]
 fn main() {
-    let cfg = op::perf::CounterConfig {
+    let cfg = perf::CounterConfig {
         calling_process: true,
         pid: 0,
         any_cpu: true,
@@ -16,10 +18,10 @@ fn main() {
 
         event: 1,
     };
-    let counter = op::perf::Counter::new(&cfg).unwrap();
+    let counter = perf::Counter::new(&cfg).unwrap();
 
     counter.enable().unwrap();
-    op::log("do something here...");
+    println!("do something here...");
     counter.disable().unwrap();
 
     let result = counter.get_result().unwrap();

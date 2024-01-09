@@ -13,4 +13,4 @@ strip = true
 codegen-units = 1
 
 [dependencies]
-profiling = { path = "../../..", features = ["profiling-dev"] }
+profiling = { path = "../../..", features = ["prelude"] }

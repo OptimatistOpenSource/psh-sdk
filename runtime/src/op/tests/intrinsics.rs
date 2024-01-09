@@ -50,5 +50,8 @@ fn test_panic() {
     assert_eq!(out[0], "0");
     let err = data.error_log();
     assert_eq!(err.len(), 1);
-    assert_eq!(err[0], "profiling panic: panicked at src/lib.rs:6:1:\noops");
+    assert_eq!(
+        err[0],
+        "Profiling panic: \npanicked at src/lib.rs:6:1:\noops"
+    );
 }

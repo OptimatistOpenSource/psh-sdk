@@ -785,16 +785,8 @@ dependencies = [
 name = "profiling"
 version = "0.1.0"
 dependencies = [
- "profiling-macros",
  "profiling-prelude",
-]
-
-[[package]]
-name = "profiling-macros"
-version = "0.0.0"
-dependencies = [
- "proc-macro2",
- "syn",
+ "profiling-runtime",
 ]
 
 [[package]]
@@ -805,6 +797,7 @@ dependencies = [
  "profiling-prelude-intrinsics",
  "profiling-prelude-macros",
  "profiling-prelude-perf",
+ "profiling-prelude-proc-macros",
  "wee_alloc",
 ]
 
@@ -835,6 +828,14 @@ version = "0.0.0"
 dependencies = [
  "profiling-prelude-intrinsics",
  "wit-bindgen",
+]
+
+[[package]]
+name = "profiling-prelude-proc-macros"
+version = "0.0.0"
+dependencies = [
+ "proc-macro2",
+ "syn",
 ]
 
 [[package]]

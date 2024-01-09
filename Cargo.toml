@@ -5,10 +5,9 @@ edition = "2021"
 
 [workspace]
 members = [
-    "macros",
-    "runtime",
     "prelude",
     "prelude/include/*",
+    "runtime",
 ]
 exclude = [
     "aot",
@@ -17,9 +16,8 @@ exclude = [
 ]
 
 [features]
-profiling-dev = ["profiling-macros", "profiling-prelude"]
-profiling-macros = []
-profiling-prelude = []
+prelude = ["dep:profiling-prelude"]
+runtime = ["dep:profiling-runtime"]
 
 #[profile.release]
 #lto = true
@@ -27,5 +25,5 @@ profiling-prelude = []
 #codegen-units = 1
 
 [dependencies]
-profiling-macros = { path =  "./macros" }
-profiling-prelude = { path = "./prelude" }
+profiling-prelude = { path = "./prelude", optional = true }
+profiling-runtime = { path = "./runtime", optional = true }

@@ -1,6 +1,9 @@
-#![cfg_attr(feature = "profiling-dev", no_std)]
+#![cfg_attr(feature = "prelude", no_std)]
 
-#[cfg(feature = "profiling-macros")]
-pub use profiling_macros::*;
-#[cfg(feature = "profiling-prelude")]
-pub use profiling_prelude::*;
+#[cfg(feature = "prelude")]
+pub use profiling_prelude as prelude;
+#[cfg(feature = "prelude")]
+pub use profiling_prelude::proc_macros::main;
+
+#[cfg(feature = "runtime")]
+pub use profiling_runtime as runtime;

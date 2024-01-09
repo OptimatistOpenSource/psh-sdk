@@ -1,4 +1,4 @@
-use crate::op::bindings::op::*;
+use crate::bindings::op::*;
 use alloc::boxed::Box;
 use alloc::string::String;
 use core::mem::MaybeUninit;
@@ -94,6 +94,6 @@ impl Counter {
 
 impl Drop for Counter {
     fn drop(&mut self) {
-        crate::op::drop_resource(self.rid)
+        profiling_prelude_intrinsics::drop_resource(self.rid)
     }
 }

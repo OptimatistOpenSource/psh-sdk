@@ -1,28 +1,28 @@
-use crate::infra::wasm::{copy_to_vm, move_to_vm, to_host_ptr};
+use crate::infra::wasm::{copy_to_vm, to_host_ptr};
 use crate::op;
-use crate::op::raw::perf::CounterConfig;
 use crate::profiling::runtime::Data;
+use profiling_prelude_perf_types::counting::{Config, CounterStat};
+use profiling_prelude_perf_types::{raw_parts_de, ser};
 use wasmtime::Caller;
 
 pub fn new_counter(
     mut caller: Caller<Data>,
     ret_area_vm_ptr: u32,
-    serialized_cfg_vm_ptr: u32,
-    serialized_cfg_len: u32,
+    sered_cfg_vm_ptr: u32,
+    sered_cfg_len: u32,
 ) {
     let caller = &mut caller;
 
-    let serialized_cfg_ptr = unsafe { to_host_ptr(caller, serialized_cfg_vm_ptr) };
-
-    // TODO: deserialize here...
-    let _ = serialized_cfg_len;
-    let cfg = unsafe { &*(serialized_cfg_ptr as *const CounterConfig) };
+    let cfg: Config = unsafe {
+        let ptr = to_host_ptr(caller, sered_cfg_vm_ptr);
+        raw_parts_de(ptr as _, sered_cfg_len as _)
+    };
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
-    match op::raw::perf::new_counter(cfg).map(|it| caller.data_mut().add_resource(it)) {
-        Ok(id) => {
+    match op::raw::perf::counting::new_counter(&cfg).map(|it| caller.data_mut().add_resource(it)) {
+        Ok(counter_rid) => {
             ret_area[0] = 1;
-            ret_area[1] = id;
+            ret_area[1] = counter_rid;
         }
         Err(e) => {
             let e = e.to_string();
@@ -38,7 +38,7 @@ pub fn enable_counter(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_ri
         .data()
         .get_resource(counter_rid)
         .ok_or("Invalid rid")
-        .map(op::raw::perf::enable_counter);
+        .map(op::raw::perf::counting::enable_counter);
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match result {
@@ -58,7 +58,7 @@ pub fn disable_counter(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_r
         .data()
         .get_resource(counter_rid)
         .ok_or("Invalid rid")
-        .map(op::raw::perf::disable_counter);
+        .map(op::raw::perf::counting::disable_counter);
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match result {
@@ -72,34 +72,47 @@ pub fn disable_counter(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_r
     }
 }
 
-#[repr(C)]
-struct CounterResult {
-    pub event_count: u64,
-    pub time_enabled: u64,
-    pub time_running: u64,
-}
-
-pub fn get_counter_result(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
+pub fn reset_counter_count(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
     let caller = &mut caller;
     let result = caller
-        .data_mut()
-        .get_resource_mut(counter_rid)
-        .ok_or_else(|| "Invalid rid".to_string())
-        .and_then(|it| op::raw::perf::get_counter_result(it).map_err(|e| e.to_string()));
+        .data()
+        .get_resource(counter_rid)
+        .ok_or("Invalid rid")
+        .map(op::raw::perf::counting::reset_counter_count);
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match result {
-        Ok(result) => {
-            // TODO: serialize here...
-            let cr = CounterResult {
-                event_count: result.event_count,
-                time_enabled: result.time_enabled,
-                time_running: result.time_running,
-            };
-            let vm_ptr = unsafe { move_to_vm(caller, cr) };
-            let len = 0;
+        Ok(_) => {
+            ret_area[0] = 1;
+        }
+        Err(e) => {
+            let vm_ptr = unsafe { copy_to_vm(caller, e) };
+            *ret_area = [0, vm_ptr, e.len() as _];
+        }
+    }
+}
 
-            *ret_area = [1, vm_ptr, len];
+pub fn get_counter_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
+    let caller = &mut caller;
+    let stat = caller
+        .data_mut()
+        .get_resource_mut(counter_rid)
+        .ok_or_else(|| "Invalid rid".to_string())
+        .and_then(|it| op::raw::perf::counting::get_counter_stat(it).map_err(|e| e.to_string()));
+
+    let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
+    match stat {
+        Ok(stat) => {
+            let result = CounterStat {
+                event_id: stat.event_id,
+                event_count:  stat.event_count,
+                time_enabled: stat.time_enabled,
+                time_running: stat.time_running,
+            };
+            let sered_cr = ser(&result);
+            let vm_ptr = unsafe { copy_to_vm(caller, sered_cr.as_ref()) };
+
+            *ret_area = [1, vm_ptr, sered_cr.len() as _];
         }
         Err(e) => {
             let vm_ptr = unsafe { copy_to_vm(caller, e.as_str()) };

@@ -4,8 +4,8 @@ world bindings {
     import op: interface {
         perf-new-counter: func(
             ret-area-ptr: u32,
-            serialized-cfg-ptr: u32,
-            serialized-cfg-len: u32,
+            sered-cfg-ptr: u32,
+            sered-cfg-len: u32,
         );
         perf-enable-counter: func(
             ret-area-ptr: u32,
@@ -15,7 +15,11 @@ world bindings {
             ret-area-ptr: u32,
             counter-rid: u32
         );
-        perf-get-counter-result: func(
+        perf-reset-counter-count: func(
+            ret-area-ptr: u32,
+            counter-rid: u32
+        );
+        perf-get-counter-stat: func(
             ret-area-ptr: u32,
             counter-rid: u32
         );

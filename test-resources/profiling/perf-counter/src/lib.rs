@@ -6,27 +6,29 @@ extern crate alloc;
 use profiling::prelude;
 use prelude::intrinsics;
 use prelude::macros::*;
-use prelude::perf;
+use prelude::proc_macros::main;
+use prelude::perf::counting::*;
+use prelude::perf::event::*;
 
-#[profiling::main]
+#[main]
 fn main() {
-    let cfg = perf::CounterConfig {
-        calling_process: true,
-        pid: 0,
-        any_cpu: true,
-        cpu: 0,
-
-        event: 1,
+    let cfg = Config {
+        cpu: Cpu::Any,
+        process: Process::Calling,
+        event: HardwareEvent::CpuCycles.into(),
+        scopes: EventScope::all(),
+        extra_config: Default::default(),
     };
-    let counter = perf::Counter::new(&cfg).unwrap();
+
+    let counter = Counter::new(&cfg).unwrap();
 
     counter.enable().unwrap();
     println!("do something here...");
     counter.disable().unwrap();
 
-    let result = counter.get_result().unwrap();
+    let result = counter.stat().unwrap();
 
-    println!("event_count: {}",  result.event_count);
+    println!("event_count: {}", result.event_count);
     println!("time_enabled: {}", result.time_enabled);
     println!("time_running: {}", result.time_running);
     assert!(result.event_count > 0);

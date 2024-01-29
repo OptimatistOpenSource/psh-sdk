@@ -24,7 +24,6 @@ pub fn write(path: &str, contents: &str) -> Result<(), String> {
 #[inline]
 pub fn append(path: &str, contents: &str) -> Result<(), String> {
     OpenOptions::new()
-        .write(true)
         .append(true)
         .open(path)
         .and_then(|mut it| write!(it, "{}", contents))

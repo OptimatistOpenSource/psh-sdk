@@ -1,7 +1,7 @@
-use rkyv::{Archive, Deserialize, Serialize};
 use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Not;
+use rkyv::{Archive, Deserialize, Serialize};
 
 #[derive(Archive, Deserialize, Serialize, PartialEq, Eq, Debug, Clone)]
 pub enum EventScope {

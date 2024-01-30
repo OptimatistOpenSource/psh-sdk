@@ -1,7 +1,7 @@
 use std::ffi::CString;
 use std::rc::Rc;
 
-use perf_event_rs::config::{Cpu as RawCpu, Process as RawProcess, Error};
+use perf_event_rs::config::{Cpu as RawCpu, Error, Process as RawProcess};
 use perf_event_rs::counting::{Config as RawConfig, Counter, ExtraConfig as RawExtraConfig};
 use perf_event_rs::event::{
     BreakpointEvent as RawBpEv, BreakpointType as RawBpTy, CacheOp as RawCacheOp,

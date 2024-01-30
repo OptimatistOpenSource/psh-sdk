@@ -129,7 +129,7 @@ pub fn counter_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid:
         Ok(stat) => {
             let stat = CounterStat {
                 event_id: stat.event_id,
-                event_count:  stat.event_count,
+                event_count: stat.event_count,
                 time_enabled: stat.time_enabled,
                 time_running: stat.time_running,
             };

@@ -7,6 +7,7 @@ use core::ptr;
 use rkyv::ser::serializers::AllocSerializer;
 use rkyv::{Archive, Deserialize, Serialize};
 
+pub mod config;
 pub mod counting;
 pub mod event;
 

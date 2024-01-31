@@ -24,7 +24,11 @@ pub enum BreakpointType {
 pub enum BreakpointLen {
     Len1,
     Len2,
+    Len3,
     Len4,
+    Len5,
+    Len6,
+    Len7,
     Len8,
 }
 

@@ -20,7 +20,7 @@ use profiling_prelude_perf_types::event::{
     KprobeConfig as KpCfg, SoftwareEvent as SwEv,
 };
 
-pub fn new_counter(process: &Process, cpu: &Cpu, cfg: &Config) -> Result<Counter, Error> {
+pub fn counter_new(process: &Process, cpu: &Cpu, cfg: &Config) -> Result<Counter, Error> {
     #[rustfmt::skip]
     let scopes: Vec<_> = cfg
         .scopes
@@ -191,19 +191,19 @@ pub fn new_counter(process: &Process, cpu: &Cpu, cfg: &Config) -> Result<Counter
     Counter::new(&process, &cpu, &cfg)
 }
 
-pub fn enable_counter(counter: &Counter) -> std::io::Result<()> {
+pub fn counter_enable(counter: &Counter) -> std::io::Result<()> {
     counter.enable()
 }
 
-pub fn disable_counter(counter: &Counter) -> std::io::Result<()> {
+pub fn counter_disable(counter: &Counter) -> std::io::Result<()> {
     counter.disable()
 }
 
-pub fn reset_counter_count(counter: &Counter) -> std::io::Result<()> {
+pub fn counter_reset_count(counter: &Counter) -> std::io::Result<()> {
     counter.reset_count()
 }
 
-pub fn get_counter_stat(counter: &mut Counter) -> std::io::Result<CounterStat> {
+pub fn counter_stat(counter: &mut Counter) -> std::io::Result<CounterStat> {
     let result = counter.stat()?;
     let result = CounterStat {
         event_id: result.event_id,

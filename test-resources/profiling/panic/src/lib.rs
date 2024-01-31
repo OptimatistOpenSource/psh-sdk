@@ -3,8 +3,9 @@
 
 use profiling::prelude;
 use prelude::intrinsics;
+use prelude::proc_macros::main;
 
-#[profiling::main]
+#[main]
 fn main() {
     intrinsics::log("0");
     panic!("oops");

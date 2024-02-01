@@ -17,10 +17,10 @@ impl From<&FromT> for Wrap<IntoT> {
         let scopes: Vec<_> = value
             .scopes
             .iter()
-            .map(|it| Wrap::<RawEvScope>::from(it).unwrap())
+            .map(|it| Wrap::<RawEvScope>::from(it).into_inner())
             .collect();
-        let event = Wrap::<RawEv>::from(&value.event).unwrap();
-        let extra_config = Wrap::<RawExtraConfig>::from(&value.extra_config).unwrap();
+        let event = Wrap::<RawEv>::from(&value.event).into_inner();
+        let extra_config = Wrap::<RawExtraConfig>::from(&value.extra_config).into_inner();
 
         Self(RawConfig::extra_new(&event, &scopes, &extra_config))
     }

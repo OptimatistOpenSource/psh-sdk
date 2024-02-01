@@ -1,5 +1,6 @@
 use crate::infra::wasm::{copy_to_vm, to_host_ptr};
 use crate::op;
+use crate::op::raw::perf::convert::Wrap;
 use crate::profiling::runtime::Data;
 use profiling_prelude_perf_types::config::{Cpu, Process};
 use profiling_prelude_perf_types::counting::{Config, CounterStat};
@@ -125,12 +126,7 @@ pub fn counter_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid:
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match stat {
         Ok(stat) => {
-            let stat = CounterStat {
-                event_id: stat.event_id,
-                event_count: stat.event_count,
-                time_enabled: stat.time_enabled,
-                time_running: stat.time_running,
-            };
+            let stat = Wrap::<CounterStat>::from(&stat).into_inner();
             let sered_stat = ser(&stat);
             let vm_ptr = unsafe { copy_to_vm(caller, sered_stat.as_ref()) };
 

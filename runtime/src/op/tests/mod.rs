@@ -43,6 +43,44 @@ pub fn gen_engine() -> ProfilingRuntime {
         .link_op("perf-counter-reset", op::perf::counter_reset)
         .unwrap()
         .link_op("perf-counter-stat", op::perf::counter_stat)
+        .unwrap()
+        .link_op("perf-counter-group-new", op::perf::counter_group_new)
+        .unwrap()
+        .link_op(
+            "perf-counter-group-add-member",
+            op::perf::counter_group_add_member,
+        )
+        .unwrap()
+        .link_op("perf-counter-group-enable", op::perf::counter_group_enable)
+        .unwrap()
+        .link_op("perf-counter-group-stat", op::perf::counter_group_stat)
+        .unwrap()
+        .link_op(
+            "perf-fixed-counter-group-enable",
+            op::perf::fixed_counter_group_enable,
+        )
+        .unwrap()
+        .link_op(
+            "perf-fixed-counter-group-disable",
+            op::perf::fixed_counter_group_disable,
+        )
+        .unwrap()
+        .link_op(
+            "perf-fixed-counter-group-reset",
+            op::perf::fixed_counter_group_reset,
+        )
+        .unwrap()
+        .link_op(
+            "perf-fixed-counter-group-stat",
+            op::perf::fixed_counter_group_stat,
+        )
+        .unwrap()
+        .link_op(
+            "perf-counter-guard-event-id",
+            op::perf::counter_guard_event_id,
+        )
+        .unwrap()
+        .link_op("perf-counter-guard-stat", op::perf::counter_guard_stat)
         .unwrap();
     engine
 }

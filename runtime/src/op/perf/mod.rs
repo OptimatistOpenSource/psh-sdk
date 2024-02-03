@@ -1,5 +1,5 @@
-pub mod counting;
 pub mod convert;
+pub mod counting;
 #[cfg(test)]
 mod tests;
 

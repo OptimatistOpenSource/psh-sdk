@@ -1,3 +1,4 @@
+use crate::op::perf::convert::Wrap;
 use perf_event_rs::config::{Cpu as RawCpu, Process as RawProcess};
 use perf_event_rs::counting::{
     Config as RawConfig, Counter, CounterStat, ExtraConfig as RawExtraConfig,
@@ -7,7 +8,6 @@ use perf_event_rs::{config, EventScope as RawEvScope};
 use profiling_prelude_perf_types::config::{Cpu, Process};
 use profiling_prelude_perf_types::counting::Config;
 use std::io;
-use crate::op::perf::convert::Wrap;
 
 type FromT = profiling_prelude_perf_types::counting::Config;
 type IntoT = perf_event_rs::counting::Config;

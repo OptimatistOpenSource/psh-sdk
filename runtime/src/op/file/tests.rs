@@ -3,7 +3,6 @@ use crate::op::test::compile_profiling;
 use crate::profiling::runtime::ProfilingRuntime;
 use crate::profiling::Profiling;
 use std::fs;
-use wasmtime::IntoFunc;
 
 fn gen_engine() -> ProfilingRuntime {
     let mut engine = ProfilingRuntime::new();

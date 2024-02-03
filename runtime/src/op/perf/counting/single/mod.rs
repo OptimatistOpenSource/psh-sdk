@@ -1,12 +1,11 @@
 mod raw;
 use crate::infra::wasm::{copy_to_vm, to_host_ptr};
-use crate::op;
+use crate::op::perf::convert::Wrap;
 use crate::profiling::runtime::Data;
 use profiling_prelude_perf_types::config::{Cpu, Process};
 use profiling_prelude_perf_types::counting::{Config, CounterStat};
 use profiling_prelude_perf_types::{raw_parts_de, ser};
 use wasmtime::Caller;
-use crate::op::perf::convert::Wrap;
 
 pub fn counter_new(
     mut caller: Caller<Data>,
@@ -35,8 +34,8 @@ pub fn counter_new(
         raw_parts_de(ptr as _, sered_cfg_len as _)
     };
 
-    let counter_rid = raw::counter_new(&process, &cpu, &cfg)
-        .map(|it| caller.data_mut().add_resource(it));
+    let counter_rid =
+        raw::counter_new(&process, &cpu, &cfg).map(|it| caller.data_mut().add_resource(it));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match counter_rid {

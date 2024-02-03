@@ -1,5 +1,3 @@
-use crate::op;
-use crate::profiling::runtime::ProfilingRuntime;
 use std::process::Command;
 
 fn compile_paot() {

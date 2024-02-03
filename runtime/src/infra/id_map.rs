@@ -1,10 +1,30 @@
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::fmt::{Debug, Formatter};
+use std::ops::Not;
 
 // TODO: can be optimized
-#[derive(Debug)]
 pub struct IdMap<T> {
     ids: BTreeSet<u32>,
     map: HashMap<u32, T>,
+}
+
+impl<T> Debug for IdMap<T>
+where
+    T: Debug,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut map = BTreeMap::<u32, Option<&T>>::new();
+        self.map
+            .iter()
+            .map(|(k, v)| (k, Some(v)))
+            .chain(self.ids.iter().map(|id| (id, None)))
+            .for_each(|(k, v)| {
+                if map.contains_key(k).not() {
+                    map.insert(*k, v);
+                }
+            });
+        f.debug_map().entries(map.iter()).finish()
+    }
 }
 
 impl<T> IdMap<T> {

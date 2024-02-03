@@ -25,6 +25,7 @@ pub fn read(mut caller: Caller<Data>, ret_area_vm_ptr: u32, path_vm_ptr: u32, pa
                 *ret_area = [1, vm_ptr, contents.len() as _];
             }
             Err(e) => {
+                let e = e.to_string();
                 let vm_ptr = copy_to_vm(caller, e.as_str());
                 *ret_area = [0, vm_ptr, e.len() as _];
             }
@@ -50,6 +51,7 @@ pub fn write(
                 ret_area[0] = 1;
             }
             Err(e) => {
+                let e = e.to_string();
                 let vm_ptr = copy_to_vm(caller, e.as_str());
                 *ret_area = [0, vm_ptr, e.len() as _];
             }
@@ -75,6 +77,7 @@ pub fn append(
                 ret_area[0] = 1;
             }
             Err(e) => {
+                let e = e.to_string();
                 let vm_ptr = copy_to_vm(caller, e.as_str());
                 *ret_area = [0, vm_ptr, e.len() as _];
             }
@@ -97,6 +100,7 @@ pub fn remove_file(
                 ret_area[0] = 1;
             }
             Err(e) => {
+                let e = e.to_string();
                 let vm_ptr = copy_to_vm(caller, e.as_str());
                 *ret_area = [0, vm_ptr, e.len() as _];
             }
@@ -114,6 +118,7 @@ pub fn create_dir(mut caller: Caller<Data>, ret_area_vm_ptr: u32, path_vm_ptr: u
                 ret_area[0] = 1;
             }
             Err(e) => {
+                let e = e.to_string();
                 let vm_ptr = copy_to_vm(caller, e.as_str());
                 *ret_area = [0, vm_ptr, e.len() as _];
             }
@@ -131,6 +136,7 @@ pub fn remove_dir(mut caller: Caller<Data>, ret_area_vm_ptr: u32, path_vm_ptr: u
                 ret_area[0] = 1;
             }
             Err(e) => {
+                let e = e.to_string();
                 let vm_ptr = copy_to_vm(caller, e.as_str());
                 *ret_area = [0, vm_ptr, e.len() as _];
             }

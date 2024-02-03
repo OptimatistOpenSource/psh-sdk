@@ -1,4 +1,3 @@
-use crate::op::raw::perf::convert::Wrap;
 use perf_event_rs::config::{Cpu as RawCpu, Error, Process as RawProcess};
 use perf_event_rs::counting::{
     Config as RawConfig, CounterGroup, CounterGroupStat, CounterGuard, CounterStat,
@@ -7,6 +6,7 @@ use perf_event_rs::counting::{
 use profiling_prelude_perf_types::config::{Cpu, Process};
 use profiling_prelude_perf_types::counting::Config;
 use std::io;
+use crate::op::perf::convert::Wrap;
 
 pub fn counter_group_new(process: &Process, cpu: &Cpu) -> Result<CounterGroup, Error> {
     let process = Wrap::<RawProcess>::from(process).into_inner();

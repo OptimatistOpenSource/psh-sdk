@@ -3,7 +3,6 @@ use crate::profiling::runtime::ProfilingRuntime;
 use std::process::Command;
 
 mod intrinsics;
-mod perf;
 
 pub fn gen_engine() -> ProfilingRuntime {
     let mut engine = ProfilingRuntime::new();

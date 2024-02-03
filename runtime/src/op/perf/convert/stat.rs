@@ -1,4 +1,4 @@
-use crate::op::raw::perf::convert::Wrap;
+use crate::op::perf::convert::Wrap;
 
 const _: () = {
     type FromT = perf_event_rs::counting::CounterStat;

@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 use crate::infra::wasm::get_str;
 use crate::profiling::runtime::Data;
 use wasmtime::Caller;

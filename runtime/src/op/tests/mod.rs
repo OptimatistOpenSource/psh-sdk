@@ -2,7 +2,6 @@ use crate::op;
 use crate::profiling::runtime::ProfilingRuntime;
 use std::process::Command;
 
-mod file;
 mod intrinsics;
 mod perf;
 

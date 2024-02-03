@@ -1,5 +1,5 @@
 use crate::op;
-use crate::op::tests::compile_profiling;
+use crate::op::test::compile_profiling;
 use crate::profiling::runtime::ProfilingRuntime;
 use crate::profiling::Profiling;
 use std::fs;

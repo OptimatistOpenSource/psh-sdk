@@ -2,8 +2,11 @@ mod raw;
 #[cfg(test)]
 mod tests;
 
-use crate::infra::wasm::{copy_to_vm, get_str, to_host_ptr};
+use crate::infra::wasm::{copy_to_vm, get_str, to_host_ptr, vm_alloc};
 use crate::profiling::runtime::Data;
+use std::fs::File;
+use std::io::Read;
+use std::slice;
 use wasmtime::Caller;
 
 pub fn is_exist(mut caller: Caller<Data>, path_vm_ptr: u32, path_len: u32) -> u32 {
@@ -16,19 +19,45 @@ pub fn is_exist(mut caller: Caller<Data>, path_vm_ptr: u32, path_len: u32) -> u3
 
 pub fn read(mut caller: Caller<Data>, ret_area_vm_ptr: u32, path_vm_ptr: u32, path_len: u32) {
     let caller = &mut caller;
-    unsafe {
-        let ret_area = &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]);
-        let path = get_str(caller, path_vm_ptr, path_len);
-        match raw::read(path) {
-            Ok(contents) => {
-                let vm_ptr = copy_to_vm(caller, contents.as_str());
-                *ret_area = [1, vm_ptr, contents.len() as _];
-            }
-            Err(e) => {
-                let e = e.to_string();
-                let vm_ptr = copy_to_vm(caller, e.as_str());
-                *ret_area = [0, vm_ptr, e.len() as _];
-            }
+
+    let ret_area_ptr = unsafe { to_host_ptr(caller, ret_area_vm_ptr) } as *mut [u32; 3];
+    let ret_area = unsafe { &mut *ret_area_ptr };
+
+    let path = unsafe { get_str(caller, path_vm_ptr, path_len) };
+
+    let mut file = match File::open(path) {
+        Ok(file) => file,
+        Err(e) => {
+            let e = e.to_string();
+            let vm_ptr = unsafe { copy_to_vm(caller, e.as_str()) };
+            *ret_area = [0, vm_ptr, e.len() as _];
+            return;
+        }
+    };
+    let file_len = match file.metadata() {
+        Ok(metadata) => metadata.len(),
+        Err(e) => {
+            let e = e.to_string();
+            let vm_ptr = unsafe { copy_to_vm(caller, e.as_str()) };
+            *ret_area = [0, vm_ptr, e.len() as _];
+            return;
+        }
+    };
+    let buf_vm_ptr = unsafe { vm_alloc(caller, file_len as _, 1) };
+    let buf_ptr = unsafe {
+        let buf_ptr = to_host_ptr(caller, buf_vm_ptr);
+        slice::from_raw_parts_mut(buf_ptr, file_len as _)
+    };
+    let buf = &mut *buf_ptr;
+
+    match file.read_exact(buf) {
+        Ok(_) => {
+            *ret_area = [1, buf_vm_ptr, file_len as _];
+        }
+        Err(e) => {
+            let e = e.to_string();
+            let vm_ptr = unsafe { copy_to_vm(caller, e.as_str()) };
+            *ret_area = [0, vm_ptr, e.len() as _];
         }
     }
 }

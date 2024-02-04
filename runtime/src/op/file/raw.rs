@@ -9,14 +9,6 @@ pub fn is_exist(path: &str) -> bool {
 }
 
 #[inline]
-pub fn read(path: &str) -> io::Result<String> {
-    match fs::read_to_string(path) {
-        Ok(content) => Ok(content),
-        Err(e) => Err(e),
-    }
-}
-
-#[inline]
 pub fn write(path: &str, contents: &str) -> io::Result<()> {
     fs::write(path, contents)
 }

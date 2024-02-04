@@ -1,9 +1,31 @@
 use crate::profiling::runtime::{Data, ProfilingRuntime};
 use crate::profiling::Profiling;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use std::borrow::Borrow;
-use wasmtime::Module;
-use wasmtime::Store;
+use wasmtime::{AsContextMut, Store, TypedFunc};
+use wasmtime::{Instance, Module};
+
+fn export_check(store: &mut Store<Data>, instance: Instance) -> Result<TypedFunc<(), ()>> {
+    // main
+    let main = instance.get_typed_func::<(), ()>(store.as_context_mut(), "main")?;
+
+    // memory
+    instance
+        .get_export(store.as_context_mut(), "memory")
+        .ok_or_else(|| anyhow!("No `memory` export"))
+        .and_then(|it| {
+            it.into_memory()
+                .ok_or_else(|| anyhow!("Invalid `memory` export"))
+        })?;
+
+    // dealloc
+    instance.get_typed_func::<(u32, u32), u32>(store.as_context_mut(), "alloc")?;
+
+    // alloc
+    instance.get_typed_func::<(u32, u32, u32), ()>(store.as_context_mut(), "dealloc")?;
+
+    Ok(main)
+}
 
 pub fn run_profiling(
     rt: &ProfilingRuntime,
@@ -28,13 +50,14 @@ pub fn run_profiling(
             store
         };
 
-        let result = rt
+        let instance = rt
             .wasm_linker
             .instantiate(&mut wasm_store, &wasm_module)
-            .map_err(|e| (Data::new(), e))?
-            .get_typed_func::<(), ()>(&mut wasm_store, "main")
-            .map_err(|e| (Data::new(), e))?
-            .call(&mut wasm_store, ());
+            .map_err(|e| (Data::new(), e))?;
+
+        let main = export_check(&mut wasm_store, instance).map_err(|e| (Data::new(), e))?;
+
+        let result = main.call(&mut wasm_store, ());
 
         let data = wasm_store.into_data();
         match result {

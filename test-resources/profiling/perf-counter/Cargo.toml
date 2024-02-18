@@ -6,6 +6,7 @@ edition = "2021"
 [lib]
 name = "profiling"
 crate-type = ["cdylib"]
+path = "src/main.rs"
 
 [profile.release]
 lto = true

@@ -52,8 +52,8 @@ pub fn enable_counter(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_ri
     let result = caller
         .data()
         .get_resource(counter_rid)
-        .ok_or("Invalid rid")
-        .map(op::raw::perf::counting::enable_counter);
+        .ok_or("Invalid rid".to_string())
+        .and_then(|it| op::raw::perf::counting::enable_counter(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match result {
@@ -61,7 +61,7 @@ pub fn enable_counter(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_ri
             ret_area[0] = 1;
         }
         Err(e) => {
-            let vm_ptr = unsafe { copy_to_vm(caller, e) };
+            let vm_ptr = unsafe { copy_to_vm(caller, e.as_str()) };
             *ret_area = [0, vm_ptr, e.len() as _];
         }
     }
@@ -72,8 +72,8 @@ pub fn disable_counter(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_r
     let result = caller
         .data()
         .get_resource(counter_rid)
-        .ok_or("Invalid rid")
-        .map(op::raw::perf::counting::disable_counter);
+        .ok_or("Invalid rid".to_string())
+        .and_then(|it| op::raw::perf::counting::disable_counter(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match result {
@@ -81,7 +81,7 @@ pub fn disable_counter(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_r
             ret_area[0] = 1;
         }
         Err(e) => {
-            let vm_ptr = unsafe { copy_to_vm(caller, e) };
+            let vm_ptr = unsafe { copy_to_vm(caller, e.as_str()) };
             *ret_area = [0, vm_ptr, e.len() as _];
         }
     }
@@ -92,8 +92,8 @@ pub fn reset_counter_count(mut caller: Caller<Data>, ret_area_vm_ptr: u32, count
     let result = caller
         .data()
         .get_resource(counter_rid)
-        .ok_or("Invalid rid")
-        .map(op::raw::perf::counting::reset_counter_count);
+        .ok_or("Invalid rid".to_string())
+        .and_then(|it| op::raw::perf::counting::reset_counter_count(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match result {
@@ -101,7 +101,7 @@ pub fn reset_counter_count(mut caller: Caller<Data>, ret_area_vm_ptr: u32, count
             ret_area[0] = 1;
         }
         Err(e) => {
-            let vm_ptr = unsafe { copy_to_vm(caller, e) };
+            let vm_ptr = unsafe { copy_to_vm(caller, e.as_str()) };
             *ret_area = [0, vm_ptr, e.len() as _];
         }
     }

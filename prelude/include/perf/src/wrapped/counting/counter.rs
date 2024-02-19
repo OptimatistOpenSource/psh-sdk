@@ -27,7 +27,7 @@ impl Counter {
         let sered_cfg_ptr = sered_cfg.as_ptr();
         let sered_cfg_len = sered_cfg.len();
 
-        perf_new_counter(
+        perf_counter_new(
             ret_area_ptr,
             sered_process_ptr as _,
             sered_process_len as _,
@@ -49,7 +49,7 @@ impl Counter {
         #[allow(invalid_value)]
         let ret_area = unsafe { MaybeUninit::<[u32; 3]>::uninit().assume_init() };
         let ret_area_ptr = ret_area.as_ptr() as _;
-        perf_enable_counter(ret_area_ptr, self.rid);
+        perf_counter_enable(ret_area_ptr, self.rid);
 
         let [is_ok, ptr, len] = ret_area;
         match is_ok {
@@ -63,7 +63,7 @@ impl Counter {
         #[allow(invalid_value)]
         let ret_area = unsafe { MaybeUninit::<[u32; 3]>::uninit().assume_init() };
         let ret_area_ptr = ret_area.as_ptr() as _;
-        perf_disable_counter(ret_area_ptr, self.rid);
+        perf_counter_disable(ret_area_ptr, self.rid);
 
         let [is_ok, ptr, len] = ret_area;
         match is_ok {
@@ -73,11 +73,11 @@ impl Counter {
         }
     }
 
-    pub fn reset_count(&self) -> Result<(), String> {
+    pub fn reset(&self) -> Result<(), String> {
         #[allow(invalid_value)]
         let ret_area = unsafe { MaybeUninit::<[u32; 3]>::uninit().assume_init() };
         let ret_area_ptr = ret_area.as_ptr() as _;
-        perf_reset_counter_count(ret_area_ptr, self.rid);
+        perf_counter_reset(ret_area_ptr, self.rid);
 
         let [is_ok, ptr, len] = ret_area;
         match is_ok {
@@ -91,7 +91,7 @@ impl Counter {
         #[allow(invalid_value)]
         let ret_area = unsafe { MaybeUninit::<[u32; 3]>::uninit().assume_init() };
         let ret_area_ptr = ret_area.as_ptr() as _;
-        perf_get_counter_stat(ret_area_ptr, self.rid);
+        perf_counter_stat(ret_area_ptr, self.rid);
 
         let [is_ok, ptr, len] = ret_area;
         match is_ok {

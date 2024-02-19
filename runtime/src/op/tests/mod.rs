@@ -34,15 +34,15 @@ pub fn gen_engine() -> ProfilingRuntime {
         .link_op("file-remove-dir", op::file::remove_dir)
         .unwrap()
         // perf ops
-        .link_op("perf-new-counter", op::perf::new_counter)
+        .link_op("perf-counter-new", op::perf::counter_new)
         .unwrap()
-        .link_op("perf-enable-counter", op::perf::enable_counter)
+        .link_op("perf-counter-enable", op::perf::counter_enable)
         .unwrap()
-        .link_op("perf-disable-counter", op::perf::disable_counter)
+        .link_op("perf-counter-disable", op::perf::counter_disable)
         .unwrap()
-        .link_op("perf-counter-reset", op::perf::reset_counter_count)
+        .link_op("perf-counter-reset", op::perf::counter_reset)
         .unwrap()
-        .link_op("perf-get-counter-stat", op::perf::get_counter_stat)
+        .link_op("perf-counter-stat", op::perf::counter_stat)
         .unwrap();
     engine
 }

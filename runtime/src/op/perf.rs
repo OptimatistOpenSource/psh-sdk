@@ -6,7 +6,7 @@ use profiling_prelude_perf_types::counting::{Config, CounterStat};
 use profiling_prelude_perf_types::{raw_parts_de, ser};
 use wasmtime::Caller;
 
-pub fn new_counter(
+pub fn counter_new(
     mut caller: Caller<Data>,
     ret_area_vm_ptr: u32,
     sered_process_vm_ptr: u32,
@@ -47,13 +47,13 @@ pub fn new_counter(
     }
 }
 
-pub fn enable_counter(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
+pub fn counter_enable(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
     let caller = &mut caller;
     let result = caller
         .data()
         .get_resource(counter_rid)
         .ok_or("Invalid rid".to_string())
-        .and_then(|it| op::raw::perf::counting::enable_counter(it).map_err(|e| e.to_string()));
+        .and_then(|it| op::raw::perf::counting::counter_enable(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match result {
@@ -67,13 +67,13 @@ pub fn enable_counter(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_ri
     }
 }
 
-pub fn disable_counter(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
+pub fn counter_disable(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
     let caller = &mut caller;
     let result = caller
         .data()
         .get_resource(counter_rid)
         .ok_or("Invalid rid".to_string())
-        .and_then(|it| op::raw::perf::counting::disable_counter(it).map_err(|e| e.to_string()));
+        .and_then(|it| op::raw::perf::counting::counter_disable(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match result {
@@ -87,13 +87,13 @@ pub fn disable_counter(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_r
     }
 }
 
-pub fn reset_counter_count(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
+pub fn counter_reset(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
     let caller = &mut caller;
     let result = caller
         .data()
         .get_resource(counter_rid)
         .ok_or("Invalid rid".to_string())
-        .and_then(|it| op::raw::perf::counting::reset_counter_count(it).map_err(|e| e.to_string()));
+        .and_then(|it| op::raw::perf::counting::counter_reset(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match result {
@@ -107,13 +107,13 @@ pub fn reset_counter_count(mut caller: Caller<Data>, ret_area_vm_ptr: u32, count
     }
 }
 
-pub fn get_counter_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
+pub fn counter_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
     let caller = &mut caller;
     let stat = caller
         .data_mut()
         .get_resource_mut(counter_rid)
         .ok_or_else(|| "Invalid rid".to_string())
-        .and_then(|it| op::raw::perf::counting::get_counter_stat(it).map_err(|e| e.to_string()));
+        .and_then(|it| op::raw::perf::counting::counter_stat(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match stat {

@@ -1,6 +1,7 @@
 use crate::infra::wasm::{copy_to_vm, to_host_ptr};
 use crate::op;
 use crate::profiling::runtime::Data;
+use profiling_prelude_perf_types::config::{Cpu, Process};
 use profiling_prelude_perf_types::counting::{Config, CounterStat};
 use profiling_prelude_perf_types::{raw_parts_de, ser};
 use wasmtime::Caller;
@@ -8,10 +9,24 @@ use wasmtime::Caller;
 pub fn new_counter(
     mut caller: Caller<Data>,
     ret_area_vm_ptr: u32,
+    sered_process_vm_ptr: u32,
+    sered_process_len: u32,
+    sered_cpu_vm_ptr: u32,
+    sered_cpu_len: u32,
     sered_cfg_vm_ptr: u32,
     sered_cfg_len: u32,
 ) {
     let caller = &mut caller;
+
+    let process: Process = unsafe {
+        let ptr = to_host_ptr(caller, sered_process_vm_ptr);
+        raw_parts_de(ptr as _, sered_process_len as _)
+    };
+
+    let cpu: Cpu = unsafe {
+        let ptr = to_host_ptr(caller, sered_cpu_vm_ptr);
+        raw_parts_de(ptr as _, sered_cpu_len as _)
+    };
 
     let cfg: Config = unsafe {
         let ptr = to_host_ptr(caller, sered_cfg_vm_ptr);

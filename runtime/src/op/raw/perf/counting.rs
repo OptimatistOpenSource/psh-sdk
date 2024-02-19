@@ -1,6 +1,7 @@
 use std::ffi::CString;
 use std::rc::Rc;
 
+use perf_event_rs::config::{Cpu as RawCpu, Process as RawProcess, Error};
 use perf_event_rs::counting::{Config as RawConfig, Counter, ExtraConfig as RawExtraConfig};
 use perf_event_rs::event::{
     BreakpointEvent as RawBpEv, BreakpointType as RawBpTy, CacheOp as RawCacheOp,
@@ -9,17 +10,17 @@ use perf_event_rs::event::{
     TracepointEvent as RawTpEv, UprobeConfig as RawUpCfg,
 };
 use perf_event_rs::{
-    BreakpointLen as RawBpLen, BuildError, Builder, DynamicPmuEvent as RawDpEv,
-    EventScope as RawEvScope,
+    BreakpointLen as RawBpLen, DynamicPmuEvent as RawDpEv, EventScope as RawEvScope,
 };
-use profiling_prelude_perf_types::counting::{Config, CounterStat, Cpu, Process};
+use profiling_prelude_perf_types::config::{Cpu, Process};
+use profiling_prelude_perf_types::counting::{Config, CounterStat};
 use profiling_prelude_perf_types::event::{
     BreakpointLen as BpLen, BreakpointType as BpTy, CacheOp, CacheOpResult,
     DynamicPmuEvent as DpEv, Event as Ev, EventScope as EvScope, HardwareEvent as HwEv,
     KprobeConfig as KpCfg, SoftwareEvent as SwEv,
 };
 
-pub fn new_counter(cfg: &Config) -> Result<Counter, BuildError> {
+pub fn new_counter(process: &Process, cpu: &Cpu, cfg: &Config) -> Result<Counter, Error> {
     #[rustfmt::skip]
     let scopes: Vec<_> = cfg
         .scopes
@@ -170,21 +171,20 @@ pub fn new_counter(cfg: &Config) -> Result<Counter, BuildError> {
         remove_on_exec: cfg.extra_config.remove_on_exec,
     };
 
-    let mut builder = Builder::new();
     #[rustfmt::skip]
-    match cfg.cpu {
-        Cpu::Any        => builder = builder.any_cpu(),
-        Cpu::On { cpu } => builder = builder.on_cpu(cpu)?,
+    let process = match process {
+        Process::Any     => RawProcess::Any,
+        Process::Current => RawProcess::Current,
+        Process::Pid(n)  => RawProcess::Pid(*n),
     };
     #[rustfmt::skip]
-    match cfg.process {
-        Process::Any        => builder = builder.any_process(),
-        Process::Calling    => builder = builder.calling_process(),
-        Process::On { pid } => builder = builder.on_process(pid)?,
+    let cpu = match cpu {
+        Cpu::Any   => RawCpu::Any,
+        Cpu::Id(n) => RawCpu::Id(*n) ,
     };
 
-    let cfg = RawConfig::new(&event, &scopes, &extra_config);
-    builder.build_counting(&cfg)
+    let cfg = RawConfig::extra_new(&event, &scopes, &extra_config);
+    Counter::new(&process, &cpu, &cfg)
 }
 
 pub fn enable_counter(counter: &Counter) -> std::io::Result<()> {

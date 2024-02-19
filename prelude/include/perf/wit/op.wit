@@ -4,6 +4,10 @@ world bindings {
     import op: interface {
         perf-new-counter: func(
             ret-area-ptr: u32,
+            sered-process-ptr: u32,
+            sered-process-len: u32,
+            sered-cpu-ptr: u32,
+            sered-cpu-len: u32,
             sered-cfg-ptr: u32,
             sered-cfg-len: u32,
         );

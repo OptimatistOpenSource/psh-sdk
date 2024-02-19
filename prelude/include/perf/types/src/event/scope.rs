@@ -11,8 +11,6 @@ pub enum EventScope {
     Idle,
     Host,
     Guest,
-    CallchainKernel,
-    CallchainUser,
 }
 
 impl EventScope {
@@ -24,8 +22,6 @@ impl EventScope {
             Self::Idle,
             Self::Host,
             Self::Guest,
-            Self::CallchainKernel,
-            Self::CallchainUser,
         ]
     }
 

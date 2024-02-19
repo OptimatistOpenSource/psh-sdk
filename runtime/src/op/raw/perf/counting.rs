@@ -32,8 +32,6 @@ pub fn new_counter(process: &Process, cpu: &Cpu, cfg: &Config) -> Result<Counter
             EvScope::Idle            => RawEvScope::Idle,
             EvScope::Host            => RawEvScope::Host,
             EvScope::Guest           => RawEvScope::Guest,
-            EvScope::CallchainKernel => RawEvScope::CallchainKernel,
-            EvScope::CallchainUser   => RawEvScope::CallchainUser,
         })
         .collect();
 

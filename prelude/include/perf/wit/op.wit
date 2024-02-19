@@ -2,6 +2,7 @@ package profiling:profiling;
 
 world bindings {
     import op: interface {
+        // counter
         perf-counter-new: func(
             ret-area-ptr: u32,
             sered-process-ptr: u32,
@@ -13,20 +14,22 @@ world bindings {
         );
         perf-counter-enable: func(
             ret-area-ptr: u32,
-            counter-rid: u32
+            counter-rid: u32,
         );
         perf-counter-disable: func(
             ret-area-ptr: u32,
-            counter-rid: u32
+            counter-rid: u32,
         );
         perf-counter-reset: func(
             ret-area-ptr: u32,
-            counter-rid: u32
+            counter-rid: u32,
         );
         perf-counter-stat: func(
             ret-area-ptr: u32,
-            counter-rid: u32
+            counter-rid: u32,
         );
+
+        // counter group
         perf-counter-group-new: func(
             ret-area-ptr: u32,
             sered-process-ptr: u32,
@@ -48,6 +51,8 @@ world bindings {
             ret-area-ptr: u32,
             counter-group-rid: u32,
         );
+
+        // fixed counter group
         perf-fixed-counter-group-enable: func(
             ret-area-ptr: u32,
             fixed-counter-group-rid: u32,
@@ -64,6 +69,8 @@ world bindings {
             ret-area-ptr: u32,
             fixed-counter-group-rid: u32,
         );
+
+        // counter guard
         perf-counter-guard-event-id: func(
             ret-area-ptr: u32,
             counter-guard-rid: u32,

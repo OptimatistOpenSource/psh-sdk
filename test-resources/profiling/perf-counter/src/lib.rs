@@ -8,19 +8,18 @@ use prelude::intrinsics;
 use prelude::macros::*;
 use prelude::proc_macros::main;
 use prelude::perf::counting::*;
+use prelude::perf::config::*;
 use prelude::perf::event::*;
 
 #[main]
 fn main() {
     let cfg = Config {
-        cpu: Cpu::Any,
-        process: Process::Calling,
         event: HardwareEvent::CpuCycles.into(),
         scopes: EventScope::all(),
         extra_config: Default::default(),
     };
 
-    let counter = Counter::new(&cfg).unwrap();
+    let counter = Counter::new(&Process::Current, &Cpu::Any, &cfg).unwrap();
 
     counter.enable().unwrap();
     println!("do something here...");

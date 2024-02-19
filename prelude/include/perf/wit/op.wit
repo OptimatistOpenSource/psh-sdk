@@ -2,24 +2,28 @@ package profiling:profiling;
 
 world bindings {
     import op: interface {
-        perf-new-counter: func(
+        perf-counter-new: func(
             ret-area-ptr: u32,
+            sered-process-ptr: u32,
+            sered-process-len: u32,
+            sered-cpu-ptr: u32,
+            sered-cpu-len: u32,
             sered-cfg-ptr: u32,
             sered-cfg-len: u32,
         );
-        perf-enable-counter: func(
+        perf-counter-enable: func(
             ret-area-ptr: u32,
             counter-rid: u32
         );
-        perf-disable-counter: func(
+        perf-counter-disable: func(
             ret-area-ptr: u32,
             counter-rid: u32
         );
-        perf-reset-counter-count: func(
+        perf-counter-reset: func(
             ret-area-ptr: u32,
             counter-rid: u32
         );
-        perf-get-counter-stat: func(
+        perf-counter-stat: func(
             ret-area-ptr: u32,
             counter-rid: u32
         );

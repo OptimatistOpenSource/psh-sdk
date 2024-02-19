@@ -1,6 +1,6 @@
+use crate::event::Event;
 use alloc::boxed::Box;
 use rkyv::{Archive, Deserialize, Serialize};
-use crate::event::Event;
 
 #[derive(Archive, Deserialize, Serialize, PartialEq, Eq, Debug, Clone)]
 pub enum KprobeConfig {

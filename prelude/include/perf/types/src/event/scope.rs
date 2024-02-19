@@ -1,7 +1,7 @@
-use rkyv::{Archive, Deserialize, Serialize};
 use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Not;
+use rkyv::{Archive, Deserialize, Serialize};
 
 #[derive(Archive, Deserialize, Serialize, PartialEq, Eq, Debug, Clone)]
 pub enum EventScope {
@@ -11,8 +11,6 @@ pub enum EventScope {
     Idle,
     Host,
     Guest,
-    CallchainKernel,
-    CallchainUser,
 }
 
 impl EventScope {
@@ -24,8 +22,6 @@ impl EventScope {
             Self::Idle,
             Self::Host,
             Self::Guest,
-            Self::CallchainKernel,
-            Self::CallchainUser,
         ]
     }
 

@@ -1,5 +1,5 @@
-use rkyv::{Archive, Deserialize, Serialize};
 use crate::event::Event;
+use rkyv::{Archive, Deserialize, Serialize};
 
 #[derive(Archive, Deserialize, Serialize, PartialEq, Eq, Debug, Clone)]
 pub struct BreakpointEvent {
@@ -24,7 +24,11 @@ pub enum BreakpointType {
 pub enum BreakpointLen {
     Len1,
     Len2,
+    Len3,
     Len4,
+    Len5,
+    Len6,
+    Len7,
     Len8,
 }
 

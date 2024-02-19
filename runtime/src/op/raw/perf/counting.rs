@@ -58,7 +58,11 @@ pub fn new_counter(process: &Process, cpu: &Cpu, cfg: &Config) -> Result<Counter
         match val {
             BpLen::Len1 => RawBpLen::Len1,
             BpLen::Len2 => RawBpLen::Len2,
+            BpLen::Len3 => RawBpLen::Len3,
             BpLen::Len4 => RawBpLen::Len4,
+            BpLen::Len5 => RawBpLen::Len5,
+            BpLen::Len6 => RawBpLen::Len6,
+            BpLen::Len7 => RawBpLen::Len7,
             BpLen::Len8 => RawBpLen::Len8,
         }
     }

@@ -40,7 +40,7 @@ pub fn gen_engine() -> ProfilingRuntime {
         .unwrap()
         .link_op("perf-disable-counter", op::perf::disable_counter)
         .unwrap()
-        .link_op("perf-reset-counter-count", op::perf::reset_counter_count)
+        .link_op("perf-counter-reset", op::perf::reset_counter_count)
         .unwrap()
         .link_op("perf-get-counter-stat", op::perf::get_counter_stat)
         .unwrap();

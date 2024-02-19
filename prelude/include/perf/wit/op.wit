@@ -19,7 +19,7 @@ world bindings {
             ret-area-ptr: u32,
             counter-rid: u32
         );
-        perf-reset-counter-count: func(
+        perf-counter-reset: func(
             ret-area-ptr: u32,
             counter-rid: u32
         );

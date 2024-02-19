@@ -1,5 +1,5 @@
 use crate::op;
-use crate::op::test::compile_profiling;
+use crate::op::test::{compile_profiling, gen_outs_errs_data};
 use crate::profiling::runtime::ProfilingRuntime;
 use crate::profiling::Profiling;
 use std::fs;
@@ -25,13 +25,17 @@ fn test_exit() {
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
     let rt = gen_rt();
 
-    let (data, r) = rt.run_profiling(profiling);
+    let (outs, errs, data) = gen_outs_errs_data();
+    let (_, r) = rt.run_profiling(data, &profiling);
+
     assert!(r.is_err());
-    let out = data.output_log();
-    assert_eq!(out.len(), 1);
-    assert_eq!(out[0], "0");
-    let err = data.error_log();
-    assert_eq!(err.len(), 0);
+
+    let outs = outs.lock().unwrap();
+    assert_eq!(outs.len(), 1);
+    assert_eq!(outs[0], "0");
+
+    let errs = errs.lock().unwrap();
+    assert_eq!(errs.len(), 0);
 }
 
 #[test]
@@ -41,15 +45,19 @@ fn test_log() {
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
     let rt = gen_rt();
 
-    let (data, r) = rt.run_profiling(profiling);
+    let (outs, errs, data) = gen_outs_errs_data();
+    let (_, r) = rt.run_profiling(data, &profiling);
+
     assert!(r.is_ok());
-    let out = data.output_log();
-    assert_eq!(out.len(), 3);
-    assert_eq!(out[0], "0");
-    assert_eq!(out[1], "1");
-    assert_eq!(out[2], "2");
-    let err = data.error_log();
-    assert_eq!(err.len(), 0);
+
+    let outs = outs.lock().unwrap();
+    assert_eq!(outs.len(), 3);
+    assert_eq!(outs[0], "0");
+    assert_eq!(outs[1], "1");
+    assert_eq!(outs[2], "2");
+
+    let errs = errs.lock().unwrap();
+    assert_eq!(errs.len(), 0);
 }
 
 #[test]
@@ -59,15 +67,19 @@ fn test_panic() {
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
     let rt = gen_rt();
 
-    let (data, r) = rt.run_profiling(profiling);
+    let (outs, errs, data) = gen_outs_errs_data();
+    let (_, r) = rt.run_profiling(data, &profiling);
+
     assert!(r.is_err());
-    let out = data.output_log();
-    assert_eq!(out.len(), 1);
-    assert_eq!(out[0], "0");
-    let err = data.error_log();
-    assert_eq!(err.len(), 1);
+
+    let outs = outs.lock().unwrap();
+    assert_eq!(outs.len(), 1);
+    assert_eq!(outs[0], "0");
+
+    let errs = errs.lock().unwrap();
+    assert_eq!(errs.len(), 1);
     assert_eq!(
-        err[0],
+        errs[0],
         "Profiling panic: \npanicked at src/lib.rs:11:5:\noops"
     );
 }

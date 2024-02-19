@@ -1,5 +1,5 @@
 use crate::op;
-use crate::op::test::compile_profiling;
+use crate::op::test::{compile_profiling, gen_outs_errs_data};
 use crate::profiling::runtime::ProfilingRuntime;
 use crate::profiling::Profiling;
 use std::fs;
@@ -37,6 +37,7 @@ fn test_file() {
     let _ = fs::remove_dir(tmp_dir);
     let _ = fs::create_dir(tmp_dir);
 
-    let (_, r) = rt.run_profiling(profiling);
+    let (_, _, data) = gen_outs_errs_data();
+    let (_, r) = rt.run_profiling(data, &profiling);
     assert!(r.is_ok());
 }

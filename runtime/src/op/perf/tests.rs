@@ -1,5 +1,5 @@
 use crate::op;
-use crate::op::test::compile_profiling;
+use crate::op::test::{compile_profiling, gen_outs_errs_data};
 use crate::profiling::runtime::ProfilingRuntime;
 use crate::profiling::Profiling;
 use std::fs;
@@ -44,14 +44,18 @@ fn test_counter() {
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
     let rt = gen_rt();
 
-    let (data, r) = rt.run_profiling(profiling);
+    let (outs, errs, data) = gen_outs_errs_data();
+    let (_, r) = rt.run_profiling(data, &profiling);
+
     assert!(r.is_ok());
-    let out = data.output_log();
-    for log in out {
-        print!("{}", log);
+
+    let outs = outs.lock().unwrap();
+    for out in outs.iter() {
+        print!("{}", out);
     }
-    let err = data.error_log();
-    assert_eq!(err.len(), 0);
+
+    let errs = errs.lock().unwrap();
+    assert_eq!(errs.len(), 0);
 }
 
 #[test]
@@ -61,12 +65,16 @@ fn test_counter_group() {
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
     let rt = gen_rt();
 
-    let (data, r) = rt.run_profiling(profiling);
+    let (outs, errs, data) = gen_outs_errs_data();
+    let (_, r) = rt.run_profiling(data, &profiling);
+
     assert!(r.is_ok());
-    let out = data.output_log();
-    for log in out {
-        print!("{}", log);
+
+    let outs = outs.lock().unwrap();
+    for out in outs.iter() {
+        print!("{}", out);
     }
-    let err = data.error_log();
-    assert_eq!(err.len(), 0);
+
+    let errs = errs.lock().unwrap();
+    assert_eq!(errs.len(), 0);
 }

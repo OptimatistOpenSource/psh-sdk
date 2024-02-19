@@ -1,7 +1,10 @@
+use crate::profiling::runtime::Data;
 use std::fs;
 use std::ops::Not;
 use std::path::Path;
 use std::process::Command;
+use std::rc::Rc;
+use std::sync::Mutex;
 
 fn compile_paot() {
     let mut cargo_build_paot = {
@@ -32,4 +35,24 @@ pub fn compile_profiling(project_path: &str) -> String {
     println!("{}", String::from_utf8(output.stdout).unwrap());
     println!("{}", String::from_utf8(output.stderr).unwrap());
     bin_path
+}
+
+pub fn gen_outs_errs_data() -> (Rc<Mutex<Vec<String>>>, Rc<Mutex<Vec<String>>>, Data) {
+    let outs = Rc::new(Mutex::new(vec![]));
+    let errs = Rc::new(Mutex::new(vec![]));
+    let data = Data::new(
+        {
+            let outs = outs.clone();
+            move |s: &str| {
+                outs.lock().unwrap().push(s.to_string());
+            }
+        },
+        {
+            let errs = errs.clone();
+            move |s: &str| {
+                errs.lock().unwrap().push(s.to_string());
+            }
+        },
+    );
+    (outs, errs, data)
 }

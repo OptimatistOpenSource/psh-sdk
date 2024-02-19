@@ -1,5 +1,5 @@
-use rkyv::{Archive, Deserialize, Serialize};
 use crate::event::Event;
+use rkyv::{Archive, Deserialize, Serialize};
 
 #[derive(Archive, Deserialize, Serialize, PartialEq, Eq, Debug, Clone)]
 pub struct BreakpointEvent {

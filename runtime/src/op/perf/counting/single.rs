@@ -33,8 +33,11 @@ pub fn counter_new(
         raw_parts_de(ptr as _, sered_cfg_len as _)
     };
 
+    let counter_rid = op::raw::perf::counting::counter_new(&process, &cpu, &cfg)
+        .map(|it| caller.data_mut().add_resource(it));
+
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
-    match op::raw::perf::counting::new_counter(&cfg).map(|it| caller.data_mut().add_resource(it)) {
+    match counter_rid {
         Ok(counter_rid) => {
             ret_area[0] = 1;
             ret_area[1] = counter_rid;
@@ -49,6 +52,7 @@ pub fn counter_new(
 
 pub fn counter_enable(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
     let caller = &mut caller;
+
     let result = caller
         .data()
         .get_resource(counter_rid)
@@ -69,6 +73,7 @@ pub fn counter_enable(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_ri
 
 pub fn counter_disable(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
     let caller = &mut caller;
+
     let result = caller
         .data()
         .get_resource(counter_rid)
@@ -89,6 +94,7 @@ pub fn counter_disable(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_r
 
 pub fn counter_reset(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
     let caller = &mut caller;
+
     let result = caller
         .data()
         .get_resource(counter_rid)
@@ -109,6 +115,7 @@ pub fn counter_reset(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid
 
 pub fn counter_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid: u32) {
     let caller = &mut caller;
+
     let stat = caller
         .data_mut()
         .get_resource_mut(counter_rid)
@@ -118,16 +125,16 @@ pub fn counter_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid:
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match stat {
         Ok(stat) => {
-            let result = CounterStat {
+            let stat = CounterStat {
                 event_id: stat.event_id,
-                event_count:  stat.event_count,
+                event_count: stat.event_count,
                 time_enabled: stat.time_enabled,
                 time_running: stat.time_running,
             };
-            let sered_cr = ser(&result);
-            let vm_ptr = unsafe { copy_to_vm(caller, sered_cr.as_ref()) };
+            let sered_stat = ser(&stat);
+            let vm_ptr = unsafe { copy_to_vm(caller, sered_stat.as_ref()) };
 
-            *ret_area = [1, vm_ptr, sered_cr.len() as _];
+            *ret_area = [1, vm_ptr, sered_stat.len() as _];
         }
         Err(e) => {
             let vm_ptr = unsafe { copy_to_vm(caller, e.as_str()) };

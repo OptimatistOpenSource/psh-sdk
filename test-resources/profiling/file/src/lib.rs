@@ -6,8 +6,9 @@ extern crate alloc;
 use core::ops::Not;
 use profiling::prelude;
 use prelude::file;
+use prelude::proc_macros::main;
 
-#[profiling::main]
+#[main]
 fn main() {
     let file_path = "../test-resources/tmp/profiling-test-file";
 

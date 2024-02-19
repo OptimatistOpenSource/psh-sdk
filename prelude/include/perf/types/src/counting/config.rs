@@ -16,22 +16,7 @@ pub struct ExtraConfig {
 }
 
 #[derive(Archive, Deserialize, Serialize, PartialEq, Eq, Debug, Clone)]
-pub enum Cpu {
-    Any,
-    On { cpu: u32 },
-}
-
-#[derive(Archive, Deserialize, Serialize, PartialEq, Eq, Debug, Clone)]
-pub enum Process {
-    Any,
-    Calling,
-    On { pid: u32 },
-}
-
-#[derive(Archive, Deserialize, Serialize, PartialEq, Eq, Debug, Clone)]
 pub struct Config {
-    pub cpu: Cpu,
-    pub process: Process,
     pub event: Event,
     pub scopes: Vec<EventScope>,
     pub extra_config: ExtraConfig,

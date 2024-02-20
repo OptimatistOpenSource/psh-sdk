@@ -4,18 +4,18 @@ use crate::profiling::runtime::ProfilingRuntime;
 use crate::profiling::Profiling;
 use std::fs;
 
-fn gen_engine() -> ProfilingRuntime {
-    let mut engine = ProfilingRuntime::new();
+fn gen_rt() -> ProfilingRuntime {
+    let mut rt = ProfilingRuntime::new();
 
     #[rustfmt::skip]
-    engine
+    rt
     // intrinsics
     .link_op("log"          , op::intrinsics::log          ).unwrap()
     .link_op("log-err"      , op::intrinsics::log_err      ).unwrap()
     .link_op("exit"         , op::intrinsics::exit         ).unwrap()
     .link_op("drop-resource", op::intrinsics::drop_resource).unwrap();
 
-    engine
+    rt
 }
 
 #[test]
@@ -23,9 +23,9 @@ fn test_exit() {
     let bin_path = compile_profiling("../test-resources/profiling/exit");
     let wasm = fs::read(bin_path).unwrap();
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
-    let engine = gen_engine();
+    let rt = gen_rt();
 
-    let (data, r) = engine.run_profiling(profiling);
+    let (data, r) = rt.run_profiling(profiling);
     assert!(r.is_err());
     let out = data.output_log();
     assert_eq!(out.len(), 1);
@@ -39,9 +39,9 @@ fn test_log() {
     let bin_path = compile_profiling("../test-resources/profiling/log");
     let wasm = fs::read(bin_path).unwrap();
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
-    let engine = gen_engine();
+    let rt = gen_rt();
 
-    let (data, r) = engine.run_profiling(profiling);
+    let (data, r) = rt.run_profiling(profiling);
     assert!(r.is_ok());
     let out = data.output_log();
     assert_eq!(out.len(), 3);
@@ -57,9 +57,9 @@ fn test_panic() {
     let bin_path = compile_profiling("../test-resources/profiling/panic");
     let wasm = fs::read(bin_path).unwrap();
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
-    let engine = gen_engine();
+    let rt = gen_rt();
 
-    let (data, r) = engine.run_profiling(profiling);
+    let (data, r) = rt.run_profiling(profiling);
     assert!(r.is_err());
     let out = data.output_log();
     assert_eq!(out.len(), 1);

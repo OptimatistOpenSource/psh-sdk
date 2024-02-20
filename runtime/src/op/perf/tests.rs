@@ -4,11 +4,11 @@ use crate::profiling::runtime::ProfilingRuntime;
 use crate::profiling::Profiling;
 use std::fs;
 
-pub fn gen_engine() -> ProfilingRuntime {
-    let mut engine = ProfilingRuntime::new();
+pub fn gen_rt() -> ProfilingRuntime {
+    let mut rt = ProfilingRuntime::new();
 
     #[rustfmt::skip]
-    engine
+    rt
     // intrinsics
     .link_op("log"          , op::log          ).unwrap()
     .link_op("log-err"      , op::log_err      ).unwrap()
@@ -34,7 +34,7 @@ pub fn gen_engine() -> ProfilingRuntime {
     .link_op("perf-counter-guard-event-id",op::perf::counter_guard_event_id).unwrap()
     .link_op("perf-counter-guard-stat"    ,op::perf::counter_guard_stat    ).unwrap();
 
-    engine
+    rt
 }
 
 #[test]
@@ -42,9 +42,9 @@ fn test_counter() {
     let bin_path = compile_profiling("../test-resources/profiling/perf-counter");
     let wasm = fs::read(bin_path).unwrap();
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
-    let engine = gen_engine();
+    let rt = gen_rt();
 
-    let (data, r) = engine.run_profiling(profiling);
+    let (data, r) = rt.run_profiling(profiling);
     assert!(r.is_ok());
     let out = data.output_log();
     for log in out {
@@ -59,9 +59,9 @@ fn test_counter_group() {
     let bin_path = compile_profiling("../test-resources/profiling/perf-counter-group");
     let wasm = fs::read(bin_path).unwrap();
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
-    let engine = gen_engine();
+    let rt = gen_rt();
 
-    let (data, r) = engine.run_profiling(profiling);
+    let (data, r) = rt.run_profiling(profiling);
     assert!(r.is_ok());
     let out = data.output_log();
     for log in out {

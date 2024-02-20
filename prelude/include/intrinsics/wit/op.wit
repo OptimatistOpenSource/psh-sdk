@@ -5,6 +5,6 @@ world bindings {
         log: func(info-ptr: u32, info-len: u32);
         log-err: func(info-ptr: u32, info-len: u32);
         exit: func();
-        drop-resource: func(id: u32) -> u32;
+        drop-resource: func(rid: u32);
     }
 }

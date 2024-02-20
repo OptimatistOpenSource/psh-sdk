@@ -3,6 +3,7 @@ mod tests;
 
 use crate::infra::wasm::get_str;
 use crate::profiling::runtime::Data;
+use std::ops::Not;
 use wasmtime::Caller;
 
 pub fn log(mut caller: Caller<Data>, info_vm_ptr: u32, info_len: u32) {
@@ -23,10 +24,15 @@ pub fn log_err(mut caller: Caller<Data>, info_vm_ptr: u32, info_len: u32) {
     err(info.as_str());
 }
 
-pub fn exit(c: Caller<Data>) {
-    c.engine().increment_epoch();
+pub fn exit(caller: Caller<Data>) {
+    caller.engine().increment_epoch();
 }
 
-pub fn drop_resource(mut c: Caller<Data>, id: u32) -> u32 {
-    c.data_mut().drop_resource(id) as u32
+pub fn drop_resource(mut caller: Caller<Data>, id: u32) {
+    let data = caller.data_mut();
+
+    if data.drop_resource(id).not() {
+        data.err()("Failed to drop resource");
+        exit(caller)
+    }
 }

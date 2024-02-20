@@ -1,7 +1,6 @@
 use crate::profiling::runtime::{Data, ProfilingRuntime};
 use crate::profiling::Profiling;
 use anyhow::{anyhow, Result};
-use std::borrow::Borrow;
 use wasmtime::{AsContextMut, Store, TypedFunc};
 use wasmtime::{Instance, Module};
 
@@ -29,46 +28,39 @@ fn export_check(store: &mut Store<Data>, instance: Instance) -> Result<TypedFunc
 
 pub fn run_profiling(
     rt: &ProfilingRuntime,
-    profiling: impl Borrow<Profiling>,
+    data: Data,
+    profiling: &Profiling,
 ) -> (Data, Result<()>) {
-    /*
-    TODO: Refactor with try block
-    Waiting for feature: https://github.com/rust-lang/rust/issues/31436
-    */
-    fn inner(rt: &ProfilingRuntime, profiling: &Profiling) -> Result<Data, (Data, anyhow::Error)> {
-        let wasm_module = if profiling.is_aot {
-            unsafe { Module::deserialize(&rt.wasm_engine, &profiling.bytes) }
-        } else {
-            Module::new(&rt.wasm_engine, &profiling.bytes)
-        }
-        .map_err(|e| (Data::new(), e))?;
+    let module = if profiling.is_aot {
+        unsafe { Module::deserialize(&rt.engine, &profiling.bytes) }
+    } else {
+        Module::new(&rt.engine, &profiling.bytes)
+    };
+    let module = match module {
+        Ok(it) => it,
+        Err(e) => return (data, Err(e)),
+    };
 
-        let mut wasm_store = {
-            let data = Data::new(); // for log storage
-            let mut store = Store::new(&rt.wasm_engine, data);
-            store.set_epoch_deadline(1);
-            store
-        };
+    let mut store = {
+        let mut store = Store::new(&rt.engine, data);
+        store.set_epoch_deadline(1);
+        store
+    };
 
-        let instance = rt
-            .wasm_linker
-            .instantiate(&mut wasm_store, &wasm_module)
-            .map_err(|e| (Data::new(), e))?;
+    let instance = rt.linker.instantiate(&mut store, &module);
+    let instance = match instance {
+        Ok(it) => it,
+        Err(e) => return (store.into_data(), Err(e)),
+    };
 
-        let main = export_check(&mut wasm_store, instance).map_err(|e| (Data::new(), e))?;
+    let main = export_check(&mut store, instance);
+    let main = match main {
+        Ok(it) => it,
+        Err(e) => return (store.into_data(), Err(e)),
+    };
 
-        let result = main.call(&mut wasm_store, ());
-
-        let data = wasm_store.into_data();
-        match result {
-            Ok(_) => Ok(data),
-            Err(e) => Err((data, e)),
-        }
-    }
-
-    let profiling = profiling.borrow();
-    match inner(rt, profiling) {
-        Ok(data) => (data, Ok(())),
-        Err((data, e)) => (data, Err(e)),
+    match main.call(&mut store, ()) {
+        Ok(_) => (store.into_data(), Ok(())),
+        Err(e) => (store.into_data(), Err(e)),
     }
 }

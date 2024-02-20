@@ -1,32 +1,24 @@
 use crate::infra::IdMap;
 use std::any::Any;
-use std::collections::VecDeque;
+use std::fmt::{Debug, Formatter};
 
-pub type Logs = VecDeque<String>;
-
-#[derive(Debug)]
 pub struct Data {
+    out: Box<dyn FnMut(&str)>,
+    err: Box<dyn FnMut(&str)>,
     resource_map: IdMap<Box<dyn Any>>,
 }
 
-impl Default for Data {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Data {
-    pub fn new() -> Self {
-        let mut resource_map = IdMap::new();
-
-        // 0 -> output log
-        let output_log: Box<dyn Any> = Box::<Logs>::default();
-        resource_map.insert(output_log);
-        // 1 -> error log
-        let error_log: Box<dyn Any> = Box::<Logs>::default();
-        resource_map.insert(error_log);
-
-        Self { resource_map }
+    pub fn new<O, E>(out: O, err: E) -> Self
+    where
+        O: FnMut(&str) + 'static,
+        E: FnMut(&str) + 'static,
+    {
+        Self {
+            out: Box::new(out),
+            err: Box::new(err),
+            resource_map: IdMap::new(),
+        }
     }
 
     pub fn add_resource<T: 'static>(&mut self, resource: T) -> u32 {
@@ -35,10 +27,7 @@ impl Data {
     }
 
     pub fn drop_resource(&mut self, rid: u32) -> bool {
-        match rid {
-            0 | 1 => false, // TODO: logs can not be dropped
-            _ => self.resource_map.remove(rid).is_some(),
-        }
+        self.resource_map.remove(rid).is_some()
     }
 
     pub fn get_resource<T: 'static>(&self, rid: u32) -> Option<&T> {
@@ -60,22 +49,22 @@ impl Data {
             .remove(rid)
             .and_then(|it| it.downcast::<T>().ok())
     }
+
+    pub fn out(&mut self) -> &mut dyn FnMut(&str) {
+        self.out.as_mut()
+    }
+
+    pub fn err(&mut self) -> &mut dyn FnMut(&str) {
+        self.err.as_mut()
+    }
 }
 
-impl Data {
-    pub fn output_log(&self) -> &Logs {
-        self.get_resource::<Logs>(0).unwrap()
-    }
-
-    pub fn output_log_mut(&mut self) -> &mut Logs {
-        self.get_resource_mut::<Logs>(0).unwrap()
-    }
-
-    pub fn error_log(&self) -> &Logs {
-        self.get_resource::<Logs>(1).unwrap()
-    }
-
-    pub fn error_log_mut(&mut self) -> &mut Logs {
-        self.get_resource_mut::<Logs>(1).unwrap()
+impl Debug for Data {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Data")
+            .field("out", &self.out.type_id())
+            .field("err", &self.err.type_id())
+            .field("resource_map", &self.resource_map)
+            .finish()
     }
 }

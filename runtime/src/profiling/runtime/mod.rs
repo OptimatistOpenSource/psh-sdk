@@ -1,8 +1,6 @@
 mod data;
 mod run_profiling;
 
-use std::borrow::Borrow;
-
 pub use data::*;
 
 use anyhow::Result;
@@ -49,7 +47,7 @@ impl ProfilingRuntime {
         Ok(self)
     }
 
-    pub fn run_profiling(&self, profiling: impl Borrow<Profiling>) -> (Data, Result<()>) {
-        run_profiling::run_profiling(self, profiling)
+    pub fn run_profiling(&self, data: Data, profiling: &Profiling) -> (Data, Result<()>) {
+        run_profiling::run_profiling(self, data, profiling)
     }
 }

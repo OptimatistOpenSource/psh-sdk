@@ -1,8 +1,13 @@
 use std::slice;
-use wasmtime::{AsContext, AsContextMut, Caller, Memory, Val};
+use wasmtime::{AsContextMut, Caller, Val};
 
-pub fn get_mem<T>(caller: &mut Caller<T>) -> Memory {
-    caller.get_export("memory").unwrap().into_memory().unwrap()
+pub fn get_mem<'t, T>(caller: &'t mut Caller<T>) -> &'t [u8] {
+    caller
+        .get_export("memory")
+        .unwrap()
+        .into_memory()
+        .unwrap()
+        .data(caller)
 }
 
 pub unsafe fn vm_alloc<T>(caller: &mut Caller<T>, size: u32, align: u32) -> u32 {

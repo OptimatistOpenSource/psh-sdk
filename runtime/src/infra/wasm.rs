@@ -1,4 +1,3 @@
-use std::slice;
 use wasmtime::{AsContextMut, Caller, Val};
 
 pub fn get_mem<'t, T>(caller: &'t mut Caller<T>) -> &'t [u8] {
@@ -36,12 +35,6 @@ pub unsafe fn vm_dealloc<T>(caller: &mut Caller<T>, vm_ptr: u32, size: u32, alig
 
 pub unsafe fn to_host_ptr(mem: &[u8], vm_ptr: u32) -> *const u8 {
     mem.as_ptr().add(vm_ptr as _)
-}
-
-pub unsafe fn get_str<'t, T>(caller: &'t mut Caller<T>, vm_ptr: u32, len: u32) -> &'t str {
-    let ptr = to_host_ptr(caller, vm_ptr);
-    let slice = slice::from_raw_parts(ptr as _, len as _);
-    std::str::from_utf8(slice).unwrap()
 }
 
 pub unsafe fn copy_to_vm<T, V: ?Sized>(caller: &mut Caller<T>, val: &V) -> u32 {

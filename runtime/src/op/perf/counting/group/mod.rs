@@ -34,7 +34,8 @@ pub fn counter_group_new(
         raw::counter_group_new(&process, &cpu).map(|it| caller.data_mut().add_resource(it));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match counter_group_rid {
         Ok(counter_group_rid) => {
             ret_area[0] = 1;
@@ -73,7 +74,8 @@ pub fn counter_group_add_member(
         .map(|it| caller.data_mut().add_resource(it));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match counter_guard_rid {
         Ok(counter_guard_rid) => {
             ret_area[0] = 1;
@@ -101,7 +103,8 @@ pub fn counter_group_enable(
         .map(|it| caller.data_mut().add_resource(it));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match fixed_counter_guard_rid {
         Ok(fixed_counter_guard_rid) => {
             ret_area[0] = 1;
@@ -124,7 +127,8 @@ pub fn counter_group_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counte
         .and_then(|it| raw::counter_group_stat(it).map_err(|e| e.to_string()));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match stat {
         Ok(stat) => {
             let stat = Wrap::<CounterGroupStat>::from(&stat).into_inner();
@@ -154,7 +158,8 @@ pub fn fixed_counter_group_enable(
         .and_then(|it| raw::fixed_counter_group_enable(it).map_err(|e| e.to_string()));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match result {
         Ok(_) => {
             ret_area[0] = 1;
@@ -180,7 +185,8 @@ pub fn fixed_counter_group_disable(
         .and_then(|it| raw::fixed_counter_group_disable(it).map_err(|e| e.to_string()));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match result {
         Ok(_) => {
             ret_area[0] = 1;
@@ -206,7 +212,8 @@ pub fn fixed_counter_group_reset(
         .and_then(|it| raw::fixed_counter_group_reset(it).map_err(|e| e.to_string()));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match result {
         Ok(_) => {
             ret_area[0] = 1;
@@ -232,7 +239,8 @@ pub fn fixed_counter_group_stat(
         .and_then(|it| raw::fixed_counter_group_stat(it).map_err(|e| e.to_string()));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match stat {
         Ok(stat) => {
             let stat = Wrap::<CounterGroupStat>::from(&stat).into_inner();
@@ -262,7 +270,8 @@ pub fn counter_guard_event_id(
         .map(|it| raw::counter_guard_event_id(it));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match event_id {
         Ok(event_id) => {
             ret_area[0] = 1;
@@ -285,7 +294,8 @@ pub fn counter_guard_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counte
         .and_then(|it| raw::counter_guard_stat(it).map_err(|e| e.to_string()));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match stat {
         Ok(stat) => {
             let stat = Wrap::<CounterStat>::from(&stat).into_inner();

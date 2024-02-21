@@ -39,7 +39,8 @@ pub fn counter_new(
         raw::counter_new(&process, &cpu, &cfg).map(|it| caller.data_mut().add_resource(it));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match counter_rid {
         Ok(counter_rid) => {
             ret_area[0] = 1;
@@ -63,7 +64,8 @@ pub fn counter_enable(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_ri
         .and_then(|it| raw::counter_enable(it).map_err(|e| e.to_string()));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match result {
         Ok(_) => {
             ret_area[0] = 1;
@@ -85,7 +87,8 @@ pub fn counter_disable(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_r
         .and_then(|it| raw::counter_disable(it).map_err(|e| e.to_string()));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match result {
         Ok(_) => {
             ret_area[0] = 1;
@@ -107,7 +110,8 @@ pub fn counter_reset(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid
         .and_then(|it| raw::counter_reset(it).map_err(|e| e.to_string()));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match result {
         Ok(_) => {
             ret_area[0] = 1;
@@ -129,7 +133,8 @@ pub fn counter_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid:
         .and_then(|it| raw::counter_stat(it).map_err(|e| e.to_string()));
 
     let mem = get_mem(caller);
-    let ret_area = unsafe { &mut *(to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3]) };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area = unsafe { &mut *ret_area_ptr };
     match stat {
         Ok(stat) => {
             let stat = Wrap::<CounterStat>::from(&stat).into_inner();

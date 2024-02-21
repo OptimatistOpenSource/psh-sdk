@@ -1,15 +1,20 @@
 use crate::profiling::runtime::{Data, ProfilingRuntime};
 use crate::profiling::Profiling;
 use anyhow::{anyhow, Result};
-use wasmtime::{AsContextMut, Store, TypedFunc};
+use wasmtime::{AsContextMut, Memory, Store, TypedFunc};
 use wasmtime::{Instance, Module};
 
-fn export_check(store: &mut Store<Data>, instance: Instance) -> Result<TypedFunc<(), ()>> {
-    // main
+pub struct RequiredExports {
+    pub main: TypedFunc<(), ()>,
+    pub memory: Memory,
+    pub alloc: TypedFunc<(u32, u32, u32), ()>,
+    pub dealloc: TypedFunc<(u32, u32), u32>,
+}
+
+fn export_check(store: &mut Store<Data>, instance: Instance) -> Result<RequiredExports> {
     let main = instance.get_typed_func::<(), ()>(store.as_context_mut(), "main")?;
 
-    // memory
-    instance
+    let memory = instance
         .get_export(store.as_context_mut(), "memory")
         .ok_or_else(|| anyhow!("No `memory` export"))
         .and_then(|it| {
@@ -17,13 +22,17 @@ fn export_check(store: &mut Store<Data>, instance: Instance) -> Result<TypedFunc
                 .ok_or_else(|| anyhow!("Invalid `memory` export"))
         })?;
 
-    // dealloc
-    instance.get_typed_func::<(u32, u32), u32>(store.as_context_mut(), "alloc")?;
+    let alloc =
+        instance.get_typed_func::<(u32, u32, u32), ()>(store.as_context_mut(), "dealloc")?;
 
-    // alloc
-    instance.get_typed_func::<(u32, u32, u32), ()>(store.as_context_mut(), "dealloc")?;
+    let dealloc = instance.get_typed_func::<(u32, u32), u32>(store.as_context_mut(), "alloc")?;
 
-    Ok(main)
+    Ok(RequiredExports {
+        main,
+        memory,
+        alloc,
+        dealloc,
+    })
 }
 
 pub fn run_profiling(
@@ -53,13 +62,13 @@ pub fn run_profiling(
         Err(e) => return (store.into_data(), Err(e)),
     };
 
-    let main = export_check(&mut store, instance);
-    let main = match main {
+    let required_exports = export_check(&mut store, instance);
+    let required_exports = match required_exports {
         Ok(it) => it,
         Err(e) => return (store.into_data(), Err(e)),
     };
 
-    match main.call(&mut store, ()) {
+    match required_exports.main.call(&mut store, ()) {
         Ok(_) => (store.into_data(), Ok(())),
         Err(e) => (store.into_data(), Err(e)),
     }

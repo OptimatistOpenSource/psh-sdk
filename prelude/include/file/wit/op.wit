@@ -2,7 +2,7 @@ package profiling:profiling;
 
 world bindings {
     import op: interface {
-        file-is-exist: func(path-ptr: u32, path-len: u32) -> u32;
+        file-exists: func(path-ptr: u32, path-len: u32) -> u32;
         file-read: func(
             ret-area-ptr: u32,
             path-ptr: u32,

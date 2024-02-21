@@ -15,7 +15,7 @@ fn gen_rt() -> ProfilingRuntime {
     .link_op("exit"         , op::exit             ).unwrap()
     .link_op("drop-resource", op::drop_resource    ).unwrap()
     // file
-    .link_op("file-is-exist"   , op::file::is_exist   ).unwrap()
+    .link_op("file-exists"     , op::file::exists     ).unwrap()
     .link_op("file-read"       , op::file::read       ).unwrap()
     .link_op("file-write"      , op::file::write      ).unwrap()
     .link_op("file-append"     , op::file::append     ).unwrap()

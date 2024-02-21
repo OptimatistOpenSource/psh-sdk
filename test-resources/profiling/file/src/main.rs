@@ -25,25 +25,25 @@ fn main() {
 
     /*
     test:
-        op::file::is_exist
+        op::file::exists
         op::file::remove_file
     */
-    let is_exist = file::is_exist(file_path);
-    assert!(is_exist);
+    let exists = file::exists(file_path);
+    assert!(exists);
     file::remove_file(file_path).unwrap();
-    let is_exist = file::is_exist(file_path);
-    assert!(is_exist.not());
+    let exists = file::exists(file_path);
+    assert!(exists.not());
 
     /*
     test:
-        op::file::is_exist
+        op::file::exists
         op::file::create_dir
         op::file::remove_dir
     */
     file::create_dir(file_path).unwrap();
-    let is_exist = file::is_exist(file_path);
-    assert!(is_exist);
+    let exists = file::exists(file_path);
+    assert!(exists);
     file::remove_dir(file_path).unwrap();
-    let is_exist = file::is_exist(file_path);
-    assert!(is_exist.not());
+    let exists = file::exists(file_path);
+    assert!(exists.not());
 }

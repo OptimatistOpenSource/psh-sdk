@@ -3,12 +3,12 @@ use alloc::string::String;
 use core::borrow::Borrow;
 use core::mem::MaybeUninit;
 
-pub fn is_exist(path: impl Borrow<str>) -> bool {
+pub fn exists(path: impl Borrow<str>) -> bool {
     let path = path.borrow();
     let path_ptr = path.as_ptr() as _;
     let path_len = path.len() as _;
 
-    match file_is_exist(path_ptr, path_len) {
+    match file_exists(path_ptr, path_len) {
         1 => true,
         0 => false,
         _ => unreachable!(),

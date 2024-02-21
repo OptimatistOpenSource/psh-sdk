@@ -1,0 +1,8 @@
+[package]
+name = "profiling-op-intrinsics"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+wasmtime = "16.0.0"
+profiling-runtime = { path = "../../runtime" }

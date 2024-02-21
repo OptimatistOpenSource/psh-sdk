@@ -10,10 +10,10 @@ pub fn gen_rt() -> ProfilingRuntime {
     #[rustfmt::skip]
     rt
     // intrinsics
-    .link_op("log"          , op::log          ).unwrap()
-    .link_op("log-err"      , op::log_err      ).unwrap()
-    .link_op("exit"         , op::exit         ).unwrap()
-    .link_op("drop-resource", op::drop_resource).unwrap()
+    .link_op("log"          , op::intrinsics::log          ).unwrap()
+    .link_op("log-err"      , op::intrinsics::log_err      ).unwrap()
+    .link_op("exit"         , op::intrinsics::exit         ).unwrap()
+    .link_op("drop-resource", op::intrinsics::drop_resource).unwrap()
     // perf counter
     .link_op("perf-counter-new"    , op::perf::counter_new    ).unwrap()
     .link_op("perf-counter-enable" , op::perf::counter_enable ).unwrap()

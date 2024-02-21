@@ -1,11 +1,10 @@
+use std::ops::Not;
+
+use profiling_runtime::{infra::str::StrExt, infra::wasm::get_mem, profiling::runtime::Data};
+use wasmtime::Caller;
+
 #[cfg(test)]
 mod tests;
-
-use crate::infra::str::StrExt;
-use crate::infra::wasm::get_mem;
-use crate::profiling::runtime::Data;
-use std::ops::Not;
-use wasmtime::Caller;
 
 pub fn log(mut caller: Caller<Data>, info_vm_ptr: u32, info_len: u32) {
     let caller = &mut caller;
@@ -31,10 +30,10 @@ pub fn exit(caller: Caller<Data>) {
     caller.engine().increment_epoch();
 }
 
-pub fn drop_resource(mut caller: Caller<Data>, id: u32) {
+pub fn drop_resource(mut caller: Caller<Data>, rid: u32) {
     let data = caller.data_mut();
 
-    if data.drop_resource(id).not() {
+    if data.drop_resource(rid).not() {
         data.err()("Failed to drop resource");
         exit(caller)
     }

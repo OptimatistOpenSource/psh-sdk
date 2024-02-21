@@ -2,27 +2,30 @@ mod raw;
 #[cfg(test)]
 mod tests;
 
-use crate::infra::wasm::{copy_to_vm, get_str, to_host_ptr, vm_alloc};
+use crate::infra::wasm::{copy_to_vm, get_mem, to_host_ptr, vm_alloc};
 use crate::profiling::runtime::Data;
 use std::fs::File;
 use std::io::Read;
 use std::slice;
 use wasmtime::Caller;
+use crate::infra::str::StrExt;
 
 pub fn exists(mut caller: Caller<Data>, path_vm_ptr: u32, path_len: u32) -> u32 {
     let caller = &mut caller;
+    let mem = get_mem(caller);
 
-    let path = unsafe { get_str(caller, path_vm_ptr, path_len) };
+    let path = unsafe { <&str>::from_wasm_mem(mem, path_vm_ptr, path_len) };
     raw::exists(path) as _
 }
 
 pub fn read(mut caller: Caller<Data>, ret_area_vm_ptr: u32, path_vm_ptr: u32, path_len: u32) {
     let caller = &mut caller;
+    let mem = get_mem(caller);
 
-    let ret_area_ptr = unsafe { to_host_ptr(caller, ret_area_vm_ptr) } as *mut [u32; 3];
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) } as *mut [u32; 3];
     let ret_area = unsafe { &mut *ret_area_ptr };
 
-    let path = unsafe { get_str(caller, path_vm_ptr, path_len) };
+    let path = unsafe { <&str>::from_wasm_mem(mem, path_vm_ptr, path_len) };
 
     let mut file = match File::open(path) {
         Ok(file) => file,
@@ -43,8 +46,9 @@ pub fn read(mut caller: Caller<Data>, ret_area_vm_ptr: u32, path_vm_ptr: u32, pa
         }
     };
     let buf_vm_ptr = unsafe { vm_alloc(caller, file_len as _, 1) };
+    let mem = get_mem(caller);
     let buf_ptr = unsafe {
-        let buf_ptr = to_host_ptr(caller, buf_vm_ptr);
+        let buf_ptr = to_host_ptr(mem, buf_vm_ptr) as *mut u8;
         slice::from_raw_parts_mut(buf_ptr, file_len as _)
     };
     let buf = &mut *buf_ptr;
@@ -70,11 +74,12 @@ pub fn write(
     contents_len: u32,
 ) {
     let caller = &mut caller;
+    let mem = get_mem(caller);
 
-    let ret_area_ptr = unsafe { to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
     let ret_area = unsafe { &mut *ret_area_ptr };
-    let path = unsafe { get_str(caller, path_vm_ptr, path_len).to_string() };
-    let contents = unsafe { get_str(caller, contents_vm_ptr, contents_len) };
+    let path = unsafe { <&str>::from_wasm_mem(mem, path_vm_ptr, path_len).to_string() };
+    let contents = unsafe { <&str>::from_wasm_mem(mem, contents_vm_ptr, contents_len) };
 
     match raw::write(&path, contents) {
         Ok(_) => {
@@ -97,11 +102,12 @@ pub fn append(
     contents_len: u32,
 ) {
     let caller = &mut caller;
+    let mem = get_mem(caller);
 
-    let ret_area_ptr = unsafe { to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
     let ret_area = unsafe { &mut *ret_area_ptr };
-    let path = unsafe { get_str(caller, path_vm_ptr, path_len).to_string() };
-    let contents = unsafe { get_str(caller, contents_vm_ptr, contents_len) };
+    let path = unsafe { <&str>::from_wasm_mem(mem, path_vm_ptr, path_len).to_string() };
+    let contents = unsafe { <&str>::from_wasm_mem(mem, contents_vm_ptr, contents_len) };
 
     match raw::append(&path, contents) {
         Ok(_) => {
@@ -122,10 +128,11 @@ pub fn remove_file(
     path_len: u32,
 ) {
     let caller = &mut caller;
+    let mem = get_mem(caller);
 
-    let ret_area_ptr = unsafe { to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
     let ret_area = unsafe { &mut *ret_area_ptr };
-    let path = unsafe { get_str(caller, path_vm_ptr, path_len) };
+    let path = unsafe { <&str>::from_wasm_mem(mem, path_vm_ptr, path_len) };
 
     match raw::remove_file(path) {
         Ok(_) => {
@@ -141,10 +148,11 @@ pub fn remove_file(
 
 pub fn create_dir(mut caller: Caller<Data>, ret_area_vm_ptr: u32, path_vm_ptr: u32, path_len: u32) {
     let caller = &mut caller;
+    let mem = get_mem(caller);
 
-    let ret_area_ptr = unsafe { to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
     let ret_area = unsafe { &mut *ret_area_ptr };
-    let path = unsafe { get_str(caller, path_vm_ptr, path_len) };
+    let path = unsafe { <&str>::from_wasm_mem(mem, path_vm_ptr, path_len) };
 
     match raw::create_dir(path) {
         Ok(_) => {
@@ -160,10 +168,11 @@ pub fn create_dir(mut caller: Caller<Data>, ret_area_vm_ptr: u32, path_vm_ptr: u
 
 pub fn remove_dir(mut caller: Caller<Data>, ret_area_vm_ptr: u32, path_vm_ptr: u32, path_len: u32) {
     let caller = &mut caller;
+    let mem = get_mem(caller);
 
-    let ret_area_ptr = unsafe { to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3] };
+    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
     let ret_area = unsafe { &mut *ret_area_ptr };
-    let path = unsafe { get_str(caller, path_vm_ptr, path_len) };
+    let path = unsafe { <&str>::from_wasm_mem(mem, path_vm_ptr, path_len) };
 
     match raw::remove_dir(&path) {
         Ok(_) => {

@@ -49,8 +49,9 @@ pub unsafe fn copy_to_vm<T, V: ?Sized>(caller: &mut Caller<T>, val: &V) -> u32 {
     let align = std::mem::align_of_val(val);
     let dst_vm_ptr = vm_alloc(caller, size as _, align as _);
 
-    let dst = to_host_ptr(caller, dst_vm_ptr);
-    let src = val as *const _ as *const _;
+    let mem = get_mem(caller);
+    let dst = to_host_ptr(mem, dst_vm_ptr) as *mut u8;
+    let src = val as *const _ as *mut u8;
     std::ptr::copy_nonoverlapping(src, dst, size);
 
     dst_vm_ptr

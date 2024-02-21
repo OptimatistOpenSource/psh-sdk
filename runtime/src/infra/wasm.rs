@@ -34,10 +34,8 @@ pub unsafe fn vm_dealloc<T>(caller: &mut Caller<T>, vm_ptr: u32, size: u32, alig
         .unwrap();
 }
 
-pub unsafe fn to_host_ptr<T>(caller: &mut Caller<T>, vm_ptr: u32) -> *mut u8 {
-    get_mem(caller)
-        .data_ptr(caller.as_context())
-        .add(vm_ptr as _)
+pub unsafe fn to_host_ptr(mem: &[u8], vm_ptr: u32) -> *const u8 {
+    mem.as_ptr().add(vm_ptr as _)
 }
 
 pub unsafe fn get_str<'t, T>(caller: &'t mut Caller<T>, vm_ptr: u32, len: u32) -> &'t str {

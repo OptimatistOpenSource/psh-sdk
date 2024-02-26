@@ -1,4 +1,4 @@
-use crate::op::perf::convert::Wrap;
+use crate::convert::Wrap;
 
 type FromT = profiling_prelude_perf_types::counting::ExtraConfig;
 type IntoT = perf_event_rs::counting::ExtraConfig;

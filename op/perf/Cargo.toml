@@ -1,0 +1,11 @@
+[package]
+name = "profiling-op-perf"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+wasmtime = "16.0.0"
+profiling-runtime = { path = "../../runtime" }
+perf-event-rs = { path = "../../../perf-event-rs" }
+profiling-prelude-perf-types = { path = "../../prelude/include/perf/types" }
+profiling-op-intrinsics = { path = "../intrinsics" }

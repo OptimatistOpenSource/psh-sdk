@@ -1,10 +1,10 @@
 mod raw;
-use crate::infra::wasm::{copy_to_vm, get_mem, to_host_ptr};
-use crate::op::perf::convert::Wrap;
-use crate::profiling::runtime::Data;
+use crate::convert::Wrap;
 use profiling_prelude_perf_types::config::{Cpu, Process};
 use profiling_prelude_perf_types::counting::{Config, CounterStat};
 use profiling_prelude_perf_types::{raw_parts_de, ser};
+use profiling_runtime::infra::wasm::{copy_to_vm, get_mem, to_host_ptr};
+use profiling_runtime::profiling::runtime::Data;
 use wasmtime::Caller;
 
 pub fn counter_new(

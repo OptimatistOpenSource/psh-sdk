@@ -1,4 +1,4 @@
-use crate::op::perf::convert::Wrap;
+use crate::convert::Wrap;
 use perf_event_rs::config::{Cpu as RawCpu, Process as RawProcess};
 use perf_event_rs::counting::{
     Config as RawConfig, Counter, CounterStat, ExtraConfig as RawExtraConfig,

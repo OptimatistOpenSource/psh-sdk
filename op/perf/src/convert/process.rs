@@ -1,4 +1,4 @@
-use crate::op::perf::convert::Wrap;
+use crate::convert::Wrap;
 
 type FromT = profiling_prelude_perf_types::config::Process;
 type IntoT = perf_event_rs::config::Process;

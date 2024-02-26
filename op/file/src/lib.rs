@@ -2,13 +2,14 @@ mod raw;
 #[cfg(test)]
 mod tests;
 
-use crate::infra::wasm::{copy_to_vm, get_mem, to_host_ptr, vm_alloc};
-use crate::profiling::runtime::Data;
 use std::fs::File;
 use std::io::Read;
 use std::slice;
+use profiling_runtime::infra::wasm::get_mem;
 use wasmtime::Caller;
-use crate::infra::str::StrExt;
+use profiling_runtime::profiling::runtime::Data;
+use profiling_runtime::infra::str::StrExt;
+use profiling_runtime::infra::wasm::*;
 
 pub fn exists(mut caller: Caller<Data>, path_vm_ptr: u32, path_len: u32) -> u32 {
     let caller = &mut caller;

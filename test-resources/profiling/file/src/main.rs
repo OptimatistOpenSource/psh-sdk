@@ -10,7 +10,7 @@ use profiling::prelude;
 
 #[main]
 fn main() {
-    let file_path = "../test-resources/tmp/profiling-test-file";
+    let file_path = "../../test-resources/tmp/profiling-test-file";
 
     /*
     test:

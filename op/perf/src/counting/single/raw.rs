@@ -1,9 +1,8 @@
 use crate::convert::Wrap;
+use crate::profiling::perf::config::*;
 use perf_event_rs::config;
 use perf_event_rs::config::{Cpu as RawCpu, Process as RawProcess};
 use perf_event_rs::counting::{Config as RawConfig, Counter, CounterStat};
-use profiling_prelude_perf_types::config::{Cpu, Process};
-use profiling_prelude_perf_types::counting::Config;
 use std::io;
 
 pub fn counter_new(process: &Process, cpu: &Cpu, cfg: &Config) -> config::Result<Counter> {

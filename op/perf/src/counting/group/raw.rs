@@ -49,7 +49,7 @@ pub fn fixed_counter_group_stat(
     fixed_counter_group.stat()
 }
 
-pub fn counter_guard_event_id(counter_guard: &mut CounterGuard) -> u64 {
+pub fn counter_guard_event_id(counter_guard: &CounterGuard) -> u64 {
     counter_guard.event_id()
 }
 

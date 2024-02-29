@@ -54,6 +54,12 @@ impl Data {
             .map(|it| it.as_mut())
             .and_then(|it| it.downcast_mut::<T>())
     }
+
+    pub fn take_resource<T: 'static>(&mut self, rid: u32) -> Option<Box<T>> {
+        self.resource_map
+            .remove(rid)
+            .and_then(|it| it.downcast::<T>().ok())
+    }
 }
 
 impl Data {

@@ -129,29 +129,29 @@ where
     }
 }
 
-pub fn counter_guard_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_guard_rid: u32) {
-    let caller = &mut caller;
-
-    let stat = caller
-        .data_mut()
-        .get_resource_mut(counter_guard_rid)
-        .ok_or_else(|| "Invalid rid".to_string())
-        .and_then(|it| raw::counter_guard_stat(it).map_err(|e| e.to_string()));
-
-    let mem = get_mem(caller);
-    let ret_area_ptr = unsafe { to_host_ptr(mem, ret_area_vm_ptr) as *mut [u32; 3] };
-    let ret_area = unsafe { &mut *ret_area_ptr };
-    match stat {
-        Ok(stat) => {
+impl<T> HostCounterGuard for T
+where
+    T: PerfView,
+{
+    fn event_id(&mut self, self_: Resource<CounterGuard>) -> wasmtime::Result<u64> {
+        let counter_guard: &CounterGuard = PerfView::table(self).get(&self_)?;
+        let event_id = raw::counter_guard_event_id(counter_guard);
+        Ok(event_id)
+    }
+    fn stat(
+        &mut self,
+        self_: Resource<CounterGuard>,
+    ) -> wasmtime::Result<Result<CounterStat, String>> {
+        let mut f = || -> anyhow::Result<_> {
+            let counter_guard: &mut CounterGuard = PerfView::table_mut(self).get_mut(&self_)?;
+            let stat = raw::counter_guard_stat(counter_guard)?;
             let stat = Wrap::<CounterStat>::from(&stat).into_inner();
-            let sered_stat = ser(&stat);
-            let vm_ptr = unsafe { copy_to_vm(caller, sered_stat.as_ref()) };
-
-            *ret_area = [1, vm_ptr, sered_stat.len() as _];
-        }
-        Err(e) => {
-            let vm_ptr = unsafe { copy_to_vm(caller, e.as_str()) };
-            *ret_area = [0, vm_ptr, e.len() as _];
-        }
+            Ok(stat)
+        };
+        Ok(f().map_err(|e| e.to_string()))
+    }
+    fn drop(&mut self, rep: Resource<CounterGuard>) -> wasmtime::Result<()> {
+        PerfView::table_mut(self).delete(rep)?;
+        Ok(())
     }
 }

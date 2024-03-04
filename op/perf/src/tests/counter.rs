@@ -1,26 +1,67 @@
-use std::fs;
+use crate::tests::compile_component;
+use crate::{PerfCtx, PerfView};
+use wasmtime::component::{Component, Instance, Linker, ResourceTable};
+use wasmtime::{Config, Engine, Store};
+use wasmtime_wasi::preview2::{command, WasiCtx, WasiCtxBuilder, WasiView};
 
-use profiling_runtime::profiling::Profiling;
+pub struct State {
+    pub perf_ctx: PerfCtx,
+    pub wasi_ctx: WasiCtx,
+    pub table: ResourceTable,
+}
 
-use crate::tests::{compile_profiling, gen_outs_errs_data, gen_rt};
+impl WasiView for State {
+    fn table(&mut self) -> &mut ResourceTable {
+        &mut self.table
+    }
+
+    fn ctx(&mut self) -> &mut WasiCtx {
+        &mut self.wasi_ctx
+    }
+}
+
+impl PerfView for State {
+    fn table(&self) -> &ResourceTable {
+        &self.table
+    }
+
+    fn table_mut(&mut self) -> &mut ResourceTable {
+        &mut self.table
+    }
+
+    fn ctx(&self) -> &PerfCtx {
+        &self.perf_ctx
+    }
+
+    fn ctx_mut(&mut self) -> &mut PerfCtx {
+        &mut self.perf_ctx
+    }
+}
 
 #[test]
 fn test_counter() {
-    let bin_path = compile_profiling("../../test-resources/profiling/perf-counter");
-    let wasm = fs::read(bin_path).unwrap();
-    let profiling = unsafe { Profiling::from_precompiled(wasm) };
-    let rt = gen_rt();
+    let mut config = Config::new();
+    config.wasm_component_model(true);
+    let engine = Engine::new(&config).unwrap();
+    let mut store = Store::new(
+        &engine,
+        State {
+            perf_ctx: PerfCtx::new(),
+            wasi_ctx: WasiCtxBuilder::new().inherit_stdout().build(),
+            table: ResourceTable::new(),
+        },
+    );
+    let mut linker: Linker<State> = Linker::new(&engine);
+    crate::add_to_linker(&mut linker).unwrap();
+    command::sync::add_to_linker(&mut linker).unwrap();
 
-    let (outs, errs, data) = gen_outs_errs_data();
-    let (_, r) = rt.run_profiling(data, &profiling);
+    let path = "../../test-resources/profiling/test-perf-counter";
+    compile_component(path);
+    let wasm_path = format!("{}/target/wasm32-wasi/debug/test-perf-counter.wasm", path);
+    let component = Component::from_file(&engine, wasm_path).unwrap();
 
-    assert!(r.is_ok());
+    let (cmd, _): (_, Instance) =
+        command::sync::Command::instantiate(&mut store, &component, &linker).unwrap();
 
-    let outs = outs.lock().unwrap();
-    for out in outs.iter() {
-        print!("{}", out);
-    }
-
-    let errs = errs.lock().unwrap();
-    assert_eq!(errs.len(), 0);
+    cmd.wasi_cli_run().call_run(&mut store).unwrap().unwrap();
 }

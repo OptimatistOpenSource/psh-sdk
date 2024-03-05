@@ -1,29 +1,34 @@
-#![cfg(target_arch = "wasm32")]
-#![no_std]
+#[allow(dead_code)]
+mod bindings;
 
-extern crate alloc;
+use crate::bindings::profiling;
+use profiling::perf::config::{Config, Cpu, Event, EventScope, ExtraConfig, HardwareEvent, Process};
+use profiling::perf::counter_group::CounterGroup;
 
-use core::assert;
-use core::assert_eq;
-
-use prelude::intrinsics;
-use prelude::macros::*;
-use prelude::perf::config::*;
-use prelude::perf::counting::*;
-use prelude::perf::event::*;
-use prelude::proc_macros::main;
-use profiling::prelude;
-
-#[main]
 fn main() {
     let cfg = Config {
-        event: HardwareEvent::CpuCycles.into(),
-        scopes: EventScope::all(),
-        extra_config: Default::default(),
+        event: Event::Hardware(HardwareEvent::CpuCycles),
+        scopes: vec![
+            EventScope::User,
+            EventScope::Kernel,
+            EventScope::Hv,
+            EventScope::Idle,
+            EventScope::Host,
+            EventScope::Guest,
+        ],
+        extra_config: ExtraConfig {
+            pinned: false,
+            exclusive: false,
+            inherit: false,
+            inherit_stat: false,
+            inherit_thread: false,
+            enable_on_exec: false,
+            remove_on_exec: false,
+        },
     };
 
     // Test counter_group_new
-    let counter_group = CounterGroup::new(&Process::Current, &Cpu::Any).unwrap();
+    let counter_group = CounterGroup::new(Process::Current, Cpu::Any).unwrap();
 
     // Test counter_group_add_member
     let cpu_cycles_guard = counter_group.add_member(&cfg).unwrap();
@@ -33,13 +38,23 @@ fn main() {
     let stat = counter_group.stat().unwrap();
     assert_eq!(stat.time_enabled, 0);
     assert_eq!(stat.time_running, 0);
-    let cpu_cycles = stat.member_count(&cpu_cycles_guard).unwrap();
-    let instructions = stat.member_count(&instructions_guard).unwrap();
+    let cpu_cycles = stat
+        .member_counts
+        .iter()
+        .find(|(id, _)| *id == cpu_cycles_guard.event_id())
+        .map(|(_, v)| *v)
+        .unwrap();
+    let instructions = stat
+        .member_counts
+        .iter()
+        .find(|(id, _)| *id == instructions_guard.event_id())
+        .map(|(_, v)| *v)
+        .unwrap();
     assert_eq!(cpu_cycles, 0);
     assert_eq!(instructions, 0);
 
     // Test counter_group_enable
-    let fixed_counter_group = counter_group.enable().unwrap();
+    let fixed_counter_group = CounterGroup::enable(counter_group).unwrap();
     println!("do something here...");
     fixed_counter_group.disable().unwrap();
 
@@ -47,22 +62,48 @@ fn main() {
     let stat = fixed_counter_group.stat().unwrap();
     assert!(stat.time_enabled > 0);
     assert!(stat.time_running > 0);
-    let cpu_cycles = stat.member_count(&cpu_cycles_guard).unwrap();
-    let instructions = stat.member_count(&instructions_guard).unwrap();
+    let cpu_cycles = stat
+        .member_counts
+        .iter()
+        .find(|(id, _)| *id == cpu_cycles_guard.event_id())
+        .map(|(_, v)| *v)
+        .unwrap();
+    let instructions = stat
+        .member_counts
+        .iter()
+        .find(|(id, _)| *id == instructions_guard.event_id())
+        .map(|(_, v)| *v)
+        .unwrap();
     assert!(cpu_cycles > 0);
     assert!(instructions > 0);
     println!("time_enabled: {}", stat.time_enabled);
     println!("time_running: {}", stat.time_running);
-    println!("cpu cycles / instructions = {} / {}", cpu_cycles,instructions);
+    println!(
+        "cpu cycles / instructions = {} / {}",
+        cpu_cycles, instructions
+    );
 
     // Test fixed_counter_group_disable
-    assert_eq!(fixed_counter_group.stat().unwrap().time_enabled, stat.time_enabled);
+    assert_eq!(
+        fixed_counter_group.stat().unwrap().time_enabled,
+        stat.time_enabled
+    );
 
     // Test fixed_counter_group_reset
     fixed_counter_group.reset().unwrap();
     let stat = fixed_counter_group.stat().unwrap();
-    let cpu_cycles = stat.member_count(&cpu_cycles_guard).unwrap();
-    let instructions = stat.member_count(&instructions_guard).unwrap();
+    let cpu_cycles = stat
+        .member_counts
+        .iter()
+        .find(|(id, _)| *id == cpu_cycles_guard.event_id())
+        .map(|(_, v)| *v)
+        .unwrap();
+    let instructions = stat
+        .member_counts
+        .iter()
+        .find(|(id, _)| *id == instructions_guard.event_id())
+        .map(|(_, v)| *v)
+        .unwrap();
     assert_eq!(cpu_cycles, 0);
     assert_eq!(instructions, 0);
 
@@ -71,8 +112,18 @@ fn main() {
     let stat = fixed_counter_group.stat().unwrap();
     assert!(stat.time_enabled > 0);
     assert!(stat.time_running > 0);
-    let cpu_cycles = stat.member_count(&cpu_cycles_guard).unwrap();
-    let instructions = stat.member_count(&instructions_guard).unwrap();
+    let cpu_cycles = stat
+        .member_counts
+        .iter()
+        .find(|(id, _)| *id == cpu_cycles_guard.event_id())
+        .map(|(_, v)| *v)
+        .unwrap();
+    let instructions = stat
+        .member_counts
+        .iter()
+        .find(|(id, _)| *id == instructions_guard.event_id())
+        .map(|(_, v)| *v)
+        .unwrap();
     assert!(cpu_cycles > 0);
     assert!(instructions > 0);
 }

@@ -1,12 +1,14 @@
 [package]
-name = "profiling-test-perf-counter-group"
+name = "test-perf-counter-group"
 version = "0.0.0"
 edition = "2021"
+build = "build.rs"
 
-[lib]
-name = "profiling"
-crate-type = ["cdylib"]
-path = "src/main.rs"
+[package.metadata.component]
+package = "psh:profiling"
+
+[package.metadata.component.target.dependencies]
+"profiling:perf" = { path = "wit/deps/perf" }
 
 [profile.release]
 lto = true
@@ -14,4 +16,4 @@ strip = true
 codegen-units = 1
 
 [dependencies]
-profiling = { path = "../../..", features = ["prelude"] }
+wit-bindgen = { version = "0.19.1", default-features = false, features = ["realloc"] }

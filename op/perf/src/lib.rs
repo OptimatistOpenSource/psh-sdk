@@ -39,3 +39,14 @@ pub trait PerfView {
     fn ctx(&self) -> &PerfCtx;
     fn ctx_mut(&mut self) -> &mut PerfCtx;
 }
+
+impl<T> psh_sdk::perf::config::Host for T where T: PerfView {}
+impl<T> psh_sdk::perf::counter::Host for T where T: PerfView {}
+impl<T> psh_sdk::perf::counter_group::Host for T where T: PerfView {}
+
+pub fn add_to_linker<T>(linker: &mut Linker<T>) -> anyhow::Result<()>
+where
+    T: PerfView,
+{
+    crate::Imports::add_to_linker(linker, |t| t)
+}

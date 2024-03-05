@@ -1,25 +1,33 @@
-#![cfg(target_arch = "wasm32")]
-#![no_std]
+#[allow(dead_code)]
+mod bindings;
 
-extern crate alloc;
+use crate::bindings::profiling;
+use profiling::perf::config::{Config, Cpu, Event, EventScope, ExtraConfig, HardwareEvent, Process};
+use profiling::perf::counter::Counter;
 
-use profiling::prelude;
-use prelude::intrinsics;
-use prelude::macros::*;
-use prelude::proc_macros::main;
-use prelude::perf::counting::*;
-use prelude::perf::config::*;
-use prelude::perf::event::*;
-
-#[main]
 fn main() {
     let cfg = Config {
-        event: HardwareEvent::CpuCycles.into(),
-        scopes: EventScope::all(),
-        extra_config: Default::default(),
+        event: Event::Hardware(HardwareEvent::CpuCycles),
+        scopes: vec![
+            EventScope::User,
+            EventScope::Kernel,
+            EventScope::Hv,
+            EventScope::Idle,
+            EventScope::Host,
+            EventScope::Guest,
+        ],
+        extra_config: ExtraConfig {
+            pinned: false,
+            exclusive: false,
+            inherit: false,
+            inherit_stat: false,
+            inherit_thread: false,
+            enable_on_exec: false,
+            remove_on_exec: false,
+        },
     };
 
-    let counter = Counter::new(&Process::Current, &Cpu::Any, &cfg).unwrap();
+    let counter = Counter::new(Process::Current, Cpu::Any, &cfg).unwrap();
 
     counter.enable().unwrap();
     println!("do something here...");

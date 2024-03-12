@@ -1,8 +1,7 @@
 pub mod file;
 pub mod intrinsics;
 pub mod perf;
-mod raw;
-#[cfg(test)]
-mod tests;
+#[allow(dead_code)]
+mod test;
 
 pub use intrinsics::*;

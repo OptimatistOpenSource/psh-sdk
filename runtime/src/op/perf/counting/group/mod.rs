@@ -1,12 +1,12 @@
+mod raw;
 use crate::infra::wasm::{copy_to_vm, move_to_vm, to_host_ptr};
-use crate::op;
 use crate::profiling::runtime::Data;
 use profiling_prelude_perf_types::config::{Cpu, Process};
 use profiling_prelude_perf_types::counting::{Config, CounterGroupStat, CounterStat};
 use profiling_prelude_perf_types::{raw_parts_de, ser};
 use wasmtime::Caller;
 
-use crate::op::raw::perf::convert::Wrap;
+use crate::op::perf::convert::Wrap;
 use perf_event_rs::counting::CounterGroup as RawCounterGrp;
 
 pub fn counter_group_new(
@@ -29,8 +29,8 @@ pub fn counter_group_new(
         raw_parts_de(ptr as _, sered_cpu_len as _)
     };
 
-    let counter_group_rid = op::raw::perf::counting::counter_group_new(&process, &cpu)
-        .map(|it| caller.data_mut().add_resource(it));
+    let counter_group_rid =
+        raw::counter_group_new(&process, &cpu).map(|it| caller.data_mut().add_resource(it));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match counter_group_rid {
@@ -65,8 +65,7 @@ pub fn counter_group_add_member(
         .get_resource_mut::<RawCounterGrp>(counter_group_rid)
         .ok_or("Invalid rid".to_string())
         .and_then(|counter_group| {
-            op::raw::perf::counting::counter_group_add_member(counter_group, &cfg)
-                .map_err(|e| e.to_string())
+            raw::counter_group_add_member(counter_group, &cfg).map_err(|e| e.to_string())
         })
         .map(|it| caller.data_mut().add_resource(it));
 
@@ -94,9 +93,7 @@ pub fn counter_group_enable(
         .data_mut()
         .take_resource(counter_group_rid)
         .ok_or("Invalid rid".to_string())
-        .and_then(|it| {
-            op::raw::perf::counting::counter_group_enable(*it).map_err(|e| e.to_string())
-        })
+        .and_then(|it| raw::counter_group_enable(*it).map_err(|e| e.to_string()))
         .map(|it| caller.data_mut().add_resource(it));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
@@ -119,7 +116,7 @@ pub fn counter_group_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counte
         .data_mut()
         .get_resource_mut(counter_group_rid)
         .ok_or("Invalid rid".to_string())
-        .and_then(|it| op::raw::perf::counting::counter_group_stat(it).map_err(|e| e.to_string()));
+        .and_then(|it| raw::counter_group_stat(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match stat {
@@ -148,9 +145,7 @@ pub fn fixed_counter_group_enable(
         .data()
         .get_resource(fixed_counter_group_rid)
         .ok_or("Invalid rid".to_string())
-        .and_then(|it| {
-            op::raw::perf::counting::fixed_counter_group_enable(it).map_err(|e| e.to_string())
-        });
+        .and_then(|it| raw::fixed_counter_group_enable(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match result {
@@ -175,9 +170,7 @@ pub fn fixed_counter_group_disable(
         .data()
         .get_resource(fixed_counter_group_rid)
         .ok_or("Invalid rid".to_string())
-        .and_then(|it| {
-            op::raw::perf::counting::fixed_counter_group_disable(it).map_err(|e| e.to_string())
-        });
+        .and_then(|it| raw::fixed_counter_group_disable(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match result {
@@ -202,9 +195,7 @@ pub fn fixed_counter_group_reset(
         .data()
         .get_resource(fixed_counter_group_rid)
         .ok_or("Invalid rid".to_string())
-        .and_then(|it| {
-            op::raw::perf::counting::fixed_counter_group_reset(it).map_err(|e| e.to_string())
-        });
+        .and_then(|it| raw::fixed_counter_group_reset(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match result {
@@ -229,9 +220,7 @@ pub fn fixed_counter_group_stat(
         .data_mut()
         .get_resource_mut(fixed_counter_group_rid)
         .ok_or("Invalid rid".to_string())
-        .and_then(|it| {
-            op::raw::perf::counting::fixed_counter_group_stat(it).map_err(|e| e.to_string())
-        });
+        .and_then(|it| raw::fixed_counter_group_stat(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match stat {
@@ -260,7 +249,7 @@ pub fn counter_guard_event_id(
         .data_mut()
         .get_resource_mut(counter_guard_rid)
         .ok_or("Invalid rid".to_string())
-        .map(|it| op::raw::perf::counting::counter_guard_event_id(it));
+        .map(|it| raw::counter_guard_event_id(it));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match event_id {
@@ -282,7 +271,7 @@ pub fn counter_guard_stat(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counte
         .data_mut()
         .get_resource_mut(counter_guard_rid)
         .ok_or("Invalid rid".to_string())
-        .and_then(|it| op::raw::perf::counting::counter_guard_stat(it).map_err(|e| e.to_string()));
+        .and_then(|it| raw::counter_guard_stat(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
     match stat {

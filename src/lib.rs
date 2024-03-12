@@ -2,6 +2,3 @@
 
 #[cfg(feature = "prelude")]
 pub use profiling_prelude as prelude;
-
-#[cfg(feature = "runtime")]
-pub use profiling_runtime as runtime;

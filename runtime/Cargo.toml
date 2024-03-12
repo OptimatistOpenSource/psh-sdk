@@ -1,8 +1,0 @@
-[package]
-name = "profiling-runtime"
-version = "0.0.0"
-edition = "2021"
-
-[dependencies]
-anyhow = "1.0.75"
-wasmtime = "18.0.1"

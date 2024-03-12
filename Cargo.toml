@@ -7,7 +7,6 @@ edition = "2021"
 members = [
     "prelude",
     "prelude/include/*",
-    "runtime",
     "op/*",
 ]
 exclude = [
@@ -18,7 +17,6 @@ exclude = [
 
 [features]
 prelude = ["dep:profiling-prelude"]
-runtime = ["dep:profiling-runtime"]
 
 #[profile.release]
 #lto = true
@@ -27,4 +25,3 @@ runtime = ["dep:profiling-runtime"]
 
 [dependencies]
 profiling-prelude = { path = "./prelude", optional = true }
-profiling-runtime = { path = "./runtime", optional = true }

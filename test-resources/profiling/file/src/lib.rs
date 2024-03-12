@@ -4,10 +4,11 @@
 extern crate alloc;
 
 use core::ops::Not;
-use profiling::prelude;
 use prelude::file;
+use prelude::proc_macros::main;
+use profiling::prelude;
 
-#[profiling::main]
+#[main]
 fn main() {
     let file_path = "../test-resources/tmp/profiling-test-file";
 
@@ -17,7 +18,7 @@ fn main() {
         op::file::append
         op::file::read
     */
-    file::write (file_path, "0").unwrap();
+    file::write(file_path, "0").unwrap();
     file::append(file_path, "1").unwrap();
     let contents = file::read(file_path).unwrap();
     assert_eq!(contents, "01");

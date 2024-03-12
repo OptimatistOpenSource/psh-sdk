@@ -1,3 +1,6 @@
+use std::fs;
+use std::ops::Not;
+use std::path::Path;
 use std::process::Command;
 
 fn compile_paot() {
@@ -12,12 +15,15 @@ fn compile_paot() {
 }
 
 pub fn compile_profiling(project_path: &str) -> String {
-    compile_paot();
+    let paot_path = "../aot/target/release/paot";
+    if Path::new(paot_path).exists().not() {
+        compile_paot();
+    }
 
+    let _ = fs::remove_dir_all(format!("{}/target", project_path));
     let bin_name = project_path.replace('.', "_").replace('/', "-");
     let bin_path = format!("{}/target/{}", project_path, bin_name);
     let mut compile_profiling = {
-        let paot_path = "../aot/target/release/paot";
         let mut cmd = Command::new(paot_path);
         cmd.args(["-p", project_path, "-o", bin_path.as_str()]);
         cmd

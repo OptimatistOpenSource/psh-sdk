@@ -1,10 +1,11 @@
 #![cfg(target_arch = "wasm32")]
 #![no_std]
 
-use profiling::prelude;
 use prelude::intrinsics;
+use prelude::proc_macros::main;
+use profiling::prelude;
 
-#[profiling::main]
+#[main]
 fn main() {
     intrinsics::log("0");
     intrinsics::log("1");

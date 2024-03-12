@@ -5,8 +5,6 @@ edition = "2021"
 
 [workspace]
 members = [
-    "prelude",
-    "prelude/include/*",
     "op/*",
 ]
 exclude = [
@@ -16,7 +14,6 @@ exclude = [
 ]
 
 [features]
-prelude = ["dep:profiling-prelude"]
 
 #[profile.release]
 #lto = true
@@ -24,4 +21,3 @@ prelude = ["dep:profiling-prelude"]
 #codegen-units = 1
 
 [dependencies]
-profiling-prelude = { path = "./prelude", optional = true }

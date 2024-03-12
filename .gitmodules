@@ -1,0 +1,3 @@
+[submodule "psh-sdk-wit"]
+	path = psh-sdk-wit
+	url = ssh://git@ssh.github.com:443/OptimatistOpenSource/psh-sdk-wit.git

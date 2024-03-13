@@ -22,3 +22,4 @@ version = "0.1.0"
 #codegen-units = 1
 
 [dependencies]
+profiling-op-perf = { path = "crates/op/perf" }

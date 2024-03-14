@@ -5,10 +5,10 @@ edition = "2021"
 
 [workspace]
 members = [
+    "docs/template",
     "crates/op/*"
 ]
 exclude = [
-    "docs"
 ]
 
 [workspace.package]

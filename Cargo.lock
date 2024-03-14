@@ -94,6 +94,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "profiling-template"
+version = "0.0.0"
+dependencies = [
+ "profiling",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"

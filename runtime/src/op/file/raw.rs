@@ -4,7 +4,7 @@ use std::path::Path;
 use std::{fs, io};
 
 #[inline]
-pub fn is_exist(path: &str) -> bool {
+pub fn exists(path: &str) -> bool {
     Path::new(path).exists()
 }
 

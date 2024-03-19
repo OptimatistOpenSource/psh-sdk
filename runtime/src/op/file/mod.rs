@@ -9,11 +9,11 @@ use std::io::Read;
 use std::slice;
 use wasmtime::Caller;
 
-pub fn is_exist(mut caller: Caller<Data>, path_vm_ptr: u32, path_len: u32) -> u32 {
+pub fn exists(mut caller: Caller<Data>, path_vm_ptr: u32, path_len: u32) -> u32 {
     let caller = &mut caller;
 
     let path = unsafe { get_str(caller, path_vm_ptr, path_len) };
-    raw::is_exist(path) as _
+    raw::exists(path) as _
 }
 
 pub fn read(mut caller: Caller<Data>, ret_area_vm_ptr: u32, path_vm_ptr: u32, path_len: u32) {

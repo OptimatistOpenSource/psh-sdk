@@ -21,11 +21,7 @@ pub fn exit() {
 }
 
 pub fn drop_resource(rid: u32) {
-    match bindings::op::drop_resource(rid) {
-        1 => (),
-        0 => panic!("Failed to drop drop resource (rid: {})", rid),
-        _ => unreachable!(),
-    }
+    bindings::op::drop_resource(rid)
 }
 
 #[panic_handler]

@@ -1,6 +1,6 @@
 use crate::convert::Wrap;
 
-type FromT = profiling_prelude_perf_types::config::Cpu;
+type FromT = crate::profiling::perf::config::Cpu;
 type IntoT = perf_event_rs::config::Cpu;
 
 impl From<&FromT> for Wrap<IntoT> {

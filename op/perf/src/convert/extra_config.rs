@@ -1,6 +1,6 @@
 use crate::convert::Wrap;
 
-type FromT = profiling_prelude_perf_types::counting::ExtraConfig;
+type FromT = crate::profiling::perf::config::ExtraConfig;
 type IntoT = perf_event_rs::counting::ExtraConfig;
 
 impl From<&FromT> for Wrap<IntoT> {

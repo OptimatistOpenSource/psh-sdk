@@ -2,7 +2,7 @@ use crate::convert::Wrap;
 
 const _: () = {
     type FromT = perf_event_rs::counting::CounterStat;
-    type IntoT = profiling_prelude_perf_types::counting::CounterStat;
+    type IntoT = crate::profiling::perf::counter::CounterStat;
 
     impl From<&FromT> for Wrap<IntoT> {
         fn from(value: &FromT) -> Self {
@@ -20,7 +20,7 @@ const _: () = {
 
 const _: () = {
     type FromT = perf_event_rs::counting::CounterGroupStat;
-    type IntoT = profiling_prelude_perf_types::counting::CounterGroupStat;
+    type IntoT = crate::profiling::perf::counter_group::CounterGroupStat;
 
     impl From<&FromT> for Wrap<IntoT> {
         fn from(value: &FromT) -> Self {

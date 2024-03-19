@@ -5,7 +5,6 @@ edition = "2021"
 
 [dependencies]
 wasmtime = "18.0.1"
-profiling-runtime = { path = "../../runtime" }
+anyhow = "1.0.80"
+wasmtime-wasi = "18.0.1"
 perf-event-rs = { path = "../../../perf-event-rs" }
-profiling-prelude-perf-types = { path = "../../prelude/include/perf/types" }
-profiling-op-intrinsics = { path = "../intrinsics" }

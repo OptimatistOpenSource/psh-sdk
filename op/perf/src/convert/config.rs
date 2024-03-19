@@ -5,11 +5,9 @@ use perf_event_rs::counting::{
 };
 use perf_event_rs::event::Event as RawEv;
 use perf_event_rs::{config, EventScope as RawEvScope};
-use profiling_prelude_perf_types::config::{Cpu, Process};
-use profiling_prelude_perf_types::counting::Config;
 use std::io;
 
-type FromT = profiling_prelude_perf_types::counting::Config;
+type FromT = crate::profiling::perf::config::Config;
 type IntoT = perf_event_rs::counting::Config;
 
 impl From<&FromT> for Wrap<IntoT> {

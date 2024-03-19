@@ -3,6 +3,12 @@ use crate::convert::Wrap;
 use std::ffi::CString;
 use std::rc::Rc;
 
+use crate::profiling::perf::config::{
+    BreakpointLen as BpLen, BreakpointType as BpTy, CacheOp, CacheOpResult,
+    DpKprobeConfig as KpCfg, DpKprobeConfigVar as KpCfgVar, DpOtherConfig as OtherCfg,
+    DpUprobeConfig as UpCfg, DynamicPmuEvent as DpEv, Event as Ev, HardwareEvent as HwEv,
+    SoftwareEvent as SwEv,
+};
 use perf_event_rs::event::{
     BreakpointEvent as RawBpEv, BreakpointType as RawBpTy, CacheOp as RawCacheOp,
     CacheOpResult as RawCacheOpResult, Event as RawEv, HardwareEvent as RawHwEv,
@@ -10,11 +16,6 @@ use perf_event_rs::event::{
     TracepointEvent as RawTpEv, UprobeConfig as RawUpCfg,
 };
 use perf_event_rs::{BreakpointLen as RawBpLen, DynamicPmuEvent as RawDpEv};
-use profiling_prelude_perf_types::event::{
-    BreakpointLen as BpLen, BreakpointType as BpTy, CacheOp, CacheOpResult,
-    DynamicPmuEvent as DpEv, Event as Ev, HardwareEvent as HwEv, KprobeConfig as KpCfg,
-    SoftwareEvent as SwEv,
-};
 
 type FromT = Ev;
 type IntoT = RawEv;
@@ -57,7 +58,7 @@ fn into_raw_bp_len(val: &BpLen) -> RawBpLen {
 }
 
 fn into_raw_event(ev: &Ev) -> RawEv {
-    let val = match ev {
+    match ev {
         #[rustfmt::skip]
         Ev::Hardware(ev) => RawEv::Hardware(match ev {
             HwEv::CpuCycles             => RawHwEv::CpuCycles,
@@ -70,13 +71,13 @@ fn into_raw_event(ev: &Ev) -> RawEv {
             HwEv::StalledCyclesFrontend => RawHwEv::StalledCyclesFrontend,
             HwEv::StalledCyclesBackend  => RawHwEv::StalledCyclesBackend,
             HwEv::RefCpuCycles          => RawHwEv::RefCpuCycles,
-            HwEv::CacheL1d (o, r)       => RawHwEv::CacheL1d (into_raw_cache_op(o), into_raw_cache_op_result(r)),
-            HwEv::CacheL1i (o, r)       => RawHwEv::CacheL1i (into_raw_cache_op(o), into_raw_cache_op_result(r)),
-            HwEv::CacheLl  (o, r)       => RawHwEv::CacheLl  (into_raw_cache_op(o), into_raw_cache_op_result(r)),
-            HwEv::CacheDtlb(o, r)       => RawHwEv::CacheDtlb(into_raw_cache_op(o), into_raw_cache_op_result(r)),
-            HwEv::CacheItlb(o, r)       => RawHwEv::CacheItlb(into_raw_cache_op(o), into_raw_cache_op_result(r)),
-            HwEv::CacheBpu (o, r)       => RawHwEv::CacheBpu (into_raw_cache_op(o), into_raw_cache_op_result(r)),
-            HwEv::CacheNode(o, r)       => RawHwEv::CacheNode(into_raw_cache_op(o), into_raw_cache_op_result(r)),
+            HwEv::CacheL1d ((o, r)) => RawHwEv::CacheL1d (into_raw_cache_op(o), into_raw_cache_op_result(r)),
+            HwEv::CacheL1i ((o, r)) => RawHwEv::CacheL1i (into_raw_cache_op(o), into_raw_cache_op_result(r)),
+            HwEv::CacheLl  ((o, r)) => RawHwEv::CacheLl  (into_raw_cache_op(o), into_raw_cache_op_result(r)),
+            HwEv::CacheDtlb((o, r)) => RawHwEv::CacheDtlb(into_raw_cache_op(o), into_raw_cache_op_result(r)),
+            HwEv::CacheItlb((o, r)) => RawHwEv::CacheItlb(into_raw_cache_op(o), into_raw_cache_op_result(r)),
+            HwEv::CacheBpu ((o, r)) => RawHwEv::CacheBpu (into_raw_cache_op(o), into_raw_cache_op_result(r)),
+            HwEv::CacheNode((o, r)) => RawHwEv::CacheNode(into_raw_cache_op(o), into_raw_cache_op_result(r)),
         }),
         #[rustfmt::skip]
         Ev::Software(ev) => RawEv::Software(match ev {
@@ -93,69 +94,64 @@ fn into_raw_event(ev: &Ev) -> RawEv {
             SwEv::BpfOutput       => RawSwEv::BpfOutput,
             SwEv::CgroupSwitches  => RawSwEv::CgroupSwitches,
         }),
-        Ev::Raw(ev) => RawEv::Raw(unsafe { RawRawEv::new(ev.as_u64()) }),
+        Ev::Raw(ev) => RawEv::Raw(unsafe { RawRawEv::new(ev.config) }),
         Ev::Tracepoint(ev) => RawEv::Tracepoint(RawTpEv::new(ev.id)),
         Ev::Breakpoint(ev) => RawEv::Breakpoint(RawBpEv::new(match &ev.bp_type {
-            BpTy::R { addr, len } => RawBpTy::R {
+            BpTy::R((addr, len)) => RawBpTy::R {
                 addr: *addr,
-                len: into_raw_bp_len(&len),
+                len: into_raw_bp_len(len),
             },
-            BpTy::W { addr, len } => RawBpTy::W {
+            BpTy::W((addr, len)) => RawBpTy::W {
                 addr: *addr,
-                len: into_raw_bp_len(&len),
+                len: into_raw_bp_len(len),
             },
-            BpTy::Rw { addr, len } => RawBpTy::Rw {
+            BpTy::Rw((addr, len)) => RawBpTy::Rw {
                 addr: *addr,
-                len: into_raw_bp_len(&len),
+                len: into_raw_bp_len(len),
             },
-            BpTy::X { addr } => RawBpTy::X { addr: *addr },
+            BpTy::X(addr) => RawBpTy::X { addr: *addr },
         })),
         Ev::DynamicPmu(ev) => match ev {
-            DpEv::Other { r#type, config } => RawEv::DynamicPmu(RawDpEv::Other {
-                r#type: *r#type,
+            DpEv::Other(OtherCfg { ty, config }) => RawEv::DynamicPmu(RawDpEv::Other {
+                r#type: *ty,
                 config: *config,
             }),
-            DpEv::Kprobe {
-                r#type,
-                retprobe,
-                cfg,
-            } => {
-                let cfg = match cfg {
-                    KpCfg::FuncAndOffset {
-                        kprobe_func,
-                        probe_offset,
-                    } => RawKpCfg::FuncAndOffset {
-                        kprobe_func: Rc::new(unsafe {
-                            CString::from_vec_unchecked(kprobe_func.iter().cloned().collect())
-                        }),
-                        probe_offset: *probe_offset,
-                    },
-                    KpCfg::KprobeAddr(a) => RawKpCfg::KprobeAddr(*a),
+            DpEv::Kprobe(KpCfg { ty, retprobe, var }) => {
+                let cfg = match var {
+                    KpCfgVar::FuncAndOffset((kprobe_func, probe_offset)) => {
+                        RawKpCfg::FuncAndOffset {
+                            kprobe_func: Rc::new(unsafe {
+                                CString::from_vec_unchecked(kprobe_func.to_vec())
+                            }),
+                            probe_offset: *probe_offset,
+                        }
+                    }
+                    KpCfgVar::KprobeAddr(a) => RawKpCfg::KprobeAddr(*a),
                 };
                 RawEv::DynamicPmu(RawDpEv::Kprobe {
-                    r#type: *r#type,
+                    r#type: *ty,
                     retprobe: *retprobe,
                     cfg,
                 })
             }
-            DpEv::Uprobe {
-                r#type,
+            DpEv::Uprobe(UpCfg {
+                ty,
                 retprobe,
-                cfg,
-            } => {
+                uprobe_path,
+                probe_offset,
+            }) => {
                 let cfg = RawUpCfg {
                     uprobe_path: Rc::new(unsafe {
-                        CString::from_vec_unchecked(cfg.uprobe_path.iter().cloned().collect())
+                        CString::from_vec_unchecked(uprobe_path.to_vec())
                     }),
-                    probe_offset: cfg.probe_offset,
+                    probe_offset: *probe_offset,
                 };
                 RawEv::DynamicPmu(RawDpEv::Uprobe {
-                    r#type: *r#type,
+                    r#type: *ty,
                     retprobe: *retprobe,
                     cfg,
                 })
             }
         },
-    };
-    val
+    }
 }

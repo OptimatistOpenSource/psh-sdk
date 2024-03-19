@@ -8,6 +8,7 @@ members = [
     "prelude",
     "prelude/include/*",
     "runtime",
+    "op/*",
 ]
 exclude = [
     "aot",

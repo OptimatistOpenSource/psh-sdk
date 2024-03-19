@@ -848,6 +848,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "profiling-op-file"
+version = "0.0.0"
+dependencies = [
+ "profiling-op-intrinsics",
+ "profiling-runtime",
+ "wasmtime",
+]
+
+[[package]]
+name = "profiling-op-intrinsics"
+version = "0.0.0"
+dependencies = [
+ "profiling-runtime",
+ "wasmtime",
+]
+
+[[package]]
+name = "profiling-op-perf"
+version = "0.0.0"
+dependencies = [
+ "perf-event-rs",
+ "profiling-op-intrinsics",
+ "profiling-prelude-perf-types",
+ "profiling-runtime",
+ "wasmtime",
+]
+
+[[package]]
 name = "profiling-prelude"
 version = "0.0.0"
 dependencies = [
@@ -909,8 +937,6 @@ name = "profiling-runtime"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "perf-event-rs",
- "profiling-prelude-perf-types",
  "wasmtime",
 ]
 

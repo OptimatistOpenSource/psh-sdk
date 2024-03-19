@@ -1,3 +1,2 @@
-mod infra;
-pub mod op;
+pub mod infra;
 pub mod profiling;

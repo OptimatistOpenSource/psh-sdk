@@ -1,8 +1,12 @@
-use std::slice;
-use wasmtime::{AsContext, AsContextMut, Caller, Memory, Val};
+use wasmtime::{AsContextMut, Caller, Val};
 
-pub fn get_mem<T>(caller: &mut Caller<T>) -> Memory {
-    caller.get_export("memory").unwrap().into_memory().unwrap()
+pub fn get_mem<'t, T>(caller: &'t mut Caller<T>) -> &'t [u8] {
+    caller
+        .get_export("memory")
+        .unwrap()
+        .into_memory()
+        .unwrap()
+        .data(caller)
 }
 
 pub unsafe fn vm_alloc<T>(caller: &mut Caller<T>, size: u32, align: u32) -> u32 {
@@ -29,16 +33,8 @@ pub unsafe fn vm_dealloc<T>(caller: &mut Caller<T>, vm_ptr: u32, size: u32, alig
         .unwrap();
 }
 
-pub unsafe fn to_host_ptr<T>(caller: &mut Caller<T>, vm_ptr: u32) -> *mut u8 {
-    get_mem(caller)
-        .data_ptr(caller.as_context())
-        .add(vm_ptr as _)
-}
-
-pub unsafe fn get_str<'t, T>(caller: &'t mut Caller<T>, vm_ptr: u32, len: u32) -> &'t str {
-    let ptr = to_host_ptr(caller, vm_ptr);
-    let slice = slice::from_raw_parts(ptr as _, len as _);
-    std::str::from_utf8(slice).unwrap()
+pub unsafe fn to_host_ptr(mem: &[u8], vm_ptr: u32) -> *const u8 {
+    mem.as_ptr().add(vm_ptr as _)
 }
 
 pub unsafe fn copy_to_vm<T, V: ?Sized>(caller: &mut Caller<T>, val: &V) -> u32 {
@@ -46,8 +42,9 @@ pub unsafe fn copy_to_vm<T, V: ?Sized>(caller: &mut Caller<T>, val: &V) -> u32 {
     let align = std::mem::align_of_val(val);
     let dst_vm_ptr = vm_alloc(caller, size as _, align as _);
 
-    let dst = to_host_ptr(caller, dst_vm_ptr);
-    let src = val as *const _ as *const _;
+    let mem = get_mem(caller);
+    let dst = to_host_ptr(mem, dst_vm_ptr) as *mut u8;
+    let src = val as *const _ as *mut u8;
     std::ptr::copy_nonoverlapping(src, dst, size);
 
     dst_vm_ptr
@@ -58,8 +55,9 @@ pub unsafe fn move_to_vm<T, V>(caller: &mut Caller<T>, val: V) -> u32 {
     let align = std::mem::align_of::<V>();
     let dst_vm_ptr = vm_alloc(caller, size as _, align as _);
 
-    let dst = to_host_ptr(caller, dst_vm_ptr);
-    let src = &val as *const _ as *const _;
+    let mem = get_mem(caller);
+    let dst = to_host_ptr(mem, dst_vm_ptr) as *mut u8;
+    let src = &val as *const _ as *mut u8;
     std::ptr::copy_nonoverlapping(src, dst, size);
 
     dst_vm_ptr

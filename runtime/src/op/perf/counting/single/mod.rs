@@ -57,7 +57,7 @@ pub fn counter_enable(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_ri
     let result = caller
         .data()
         .get_resource(counter_rid)
-        .ok_or("Invalid rid".to_string())
+        .ok_or_else(|| "Invalid rid".to_string())
         .and_then(|it| raw::counter_enable(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
@@ -78,7 +78,7 @@ pub fn counter_disable(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_r
     let result = caller
         .data()
         .get_resource(counter_rid)
-        .ok_or("Invalid rid".to_string())
+        .ok_or_else(|| "Invalid rid".to_string())
         .and_then(|it| raw::counter_disable(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };
@@ -99,7 +99,7 @@ pub fn counter_reset(mut caller: Caller<Data>, ret_area_vm_ptr: u32, counter_rid
     let result = caller
         .data()
         .get_resource(counter_rid)
-        .ok_or("Invalid rid".to_string())
+        .ok_or_else(|| "Invalid rid".to_string())
         .and_then(|it| raw::counter_reset(it).map_err(|e| e.to_string()));
 
     let ret_area = unsafe { &mut *(to_host_ptr(caller, ret_area_vm_ptr) as *mut [u32; 3]) };

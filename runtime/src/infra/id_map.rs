@@ -34,8 +34,17 @@ impl<T> IdMap<T> {
             map: HashMap::new(),
         }
     }
+
     pub fn as_hash_map(&self) -> &HashMap<u32, T> {
         &self.map
+    }
+
+    pub fn consume_id(&mut self, id: u32) {
+        self.ids.insert(id);
+    }
+
+    pub fn produce_id(&mut self, id: u32) {
+        self.ids.remove(&id);
     }
 
     pub fn insert(&mut self, val: T) -> u32 {

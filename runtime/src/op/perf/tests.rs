@@ -1,14 +1,14 @@
 use crate::op;
-use crate::op::test::compile_profiling;
+use crate::op::test::{compile_profiling, gen_outs_errs_data};
 use crate::profiling::runtime::ProfilingRuntime;
 use crate::profiling::Profiling;
 use std::fs;
 
-pub fn gen_engine() -> ProfilingRuntime {
-    let mut engine = ProfilingRuntime::new();
+pub fn gen_rt() -> ProfilingRuntime {
+    let mut rt = ProfilingRuntime::new();
 
     #[rustfmt::skip]
-    engine
+    rt
     // intrinsics
     .link_op("log"          , op::log          ).unwrap()
     .link_op("log-err"      , op::log_err      ).unwrap()
@@ -34,7 +34,7 @@ pub fn gen_engine() -> ProfilingRuntime {
     .link_op("perf-counter-guard-event-id",op::perf::counter_guard_event_id).unwrap()
     .link_op("perf-counter-guard-stat"    ,op::perf::counter_guard_stat    ).unwrap();
 
-    engine
+    rt
 }
 
 #[test]
@@ -42,16 +42,20 @@ fn test_counter() {
     let bin_path = compile_profiling("../test-resources/profiling/perf-counter");
     let wasm = fs::read(bin_path).unwrap();
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
-    let engine = gen_engine();
+    let rt = gen_rt();
 
-    let (data, r) = engine.run_profiling(profiling);
+    let (outs, errs, data) = gen_outs_errs_data();
+    let (_, r) = rt.run_profiling(data, &profiling);
+
     assert!(r.is_ok());
-    let out = data.output_log();
-    for log in out {
-        print!("{}", log);
+
+    let outs = outs.lock().unwrap();
+    for out in outs.iter() {
+        print!("{}", out);
     }
-    let err = data.error_log();
-    assert_eq!(err.len(), 0);
+
+    let errs = errs.lock().unwrap();
+    assert_eq!(errs.len(), 0);
 }
 
 #[test]
@@ -59,14 +63,18 @@ fn test_counter_group() {
     let bin_path = compile_profiling("../test-resources/profiling/perf-counter-group");
     let wasm = fs::read(bin_path).unwrap();
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
-    let engine = gen_engine();
+    let rt = gen_rt();
 
-    let (data, r) = engine.run_profiling(profiling);
+    let (outs, errs, data) = gen_outs_errs_data();
+    let (_, r) = rt.run_profiling(data, &profiling);
+
     assert!(r.is_ok());
-    let out = data.output_log();
-    for log in out {
-        print!("{}", log);
+
+    let outs = outs.lock().unwrap();
+    for out in outs.iter() {
+        print!("{}", out);
     }
-    let err = data.error_log();
-    assert_eq!(err.len(), 0);
+
+    let errs = errs.lock().unwrap();
+    assert_eq!(errs.len(), 0);
 }

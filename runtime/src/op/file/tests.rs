@@ -1,14 +1,14 @@
 use crate::op;
-use crate::op::test::compile_profiling;
+use crate::op::test::{compile_profiling, gen_outs_errs_data};
 use crate::profiling::runtime::ProfilingRuntime;
 use crate::profiling::Profiling;
 use std::fs;
 
-fn gen_engine() -> ProfilingRuntime {
-    let mut engine = ProfilingRuntime::new();
+fn gen_rt() -> ProfilingRuntime {
+    let mut rt = ProfilingRuntime::new();
 
     #[rustfmt::skip]
-    engine
+    rt
     // intrinsics
     .link_op("log"          , op::log              ).unwrap()
     .link_op("log-err"      , op::log_err          ).unwrap()
@@ -23,7 +23,7 @@ fn gen_engine() -> ProfilingRuntime {
     .link_op("file-create-dir" , op::file::create_dir ).unwrap()
     .link_op("file-remove-dir" , op::file::remove_dir ).unwrap();
 
-    engine
+    rt
 }
 
 #[test]
@@ -31,12 +31,13 @@ fn test_file() {
     let bin_path = compile_profiling("../test-resources/profiling/file");
     let wasm = fs::read(bin_path).unwrap();
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
-    let engine = gen_engine();
+    let rt = gen_rt();
 
     let tmp_dir = "../test-resources/tmp";
     let _ = fs::remove_dir(tmp_dir);
     let _ = fs::create_dir(tmp_dir);
 
-    let (_, r) = engine.run_profiling(profiling);
+    let (_, _, data) = gen_outs_errs_data();
+    let (_, r) = rt.run_profiling(data, &profiling);
     assert!(r.is_ok());
 }

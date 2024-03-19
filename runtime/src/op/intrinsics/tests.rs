@@ -1,21 +1,21 @@
 use crate::op;
-use crate::op::test::compile_profiling;
+use crate::op::test::{compile_profiling, gen_outs_errs_data};
 use crate::profiling::runtime::ProfilingRuntime;
 use crate::profiling::Profiling;
 use std::fs;
 
-fn gen_engine() -> ProfilingRuntime {
-    let mut engine = ProfilingRuntime::new();
+fn gen_rt() -> ProfilingRuntime {
+    let mut rt = ProfilingRuntime::new();
 
     #[rustfmt::skip]
-    engine
+    rt
     // intrinsics
     .link_op("log"          , op::intrinsics::log          ).unwrap()
     .link_op("log-err"      , op::intrinsics::log_err      ).unwrap()
     .link_op("exit"         , op::intrinsics::exit         ).unwrap()
     .link_op("drop-resource", op::intrinsics::drop_resource).unwrap();
 
-    engine
+    rt
 }
 
 #[test]
@@ -23,15 +23,19 @@ fn test_exit() {
     let bin_path = compile_profiling("../test-resources/profiling/exit");
     let wasm = fs::read(bin_path).unwrap();
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
-    let engine = gen_engine();
+    let rt = gen_rt();
 
-    let (data, r) = engine.run_profiling(profiling);
+    let (outs, errs, data) = gen_outs_errs_data();
+    let (_, r) = rt.run_profiling(data, &profiling);
+
     assert!(r.is_err());
-    let out = data.output_log();
-    assert_eq!(out.len(), 1);
-    assert_eq!(out[0], "0");
-    let err = data.error_log();
-    assert_eq!(err.len(), 0);
+
+    let outs = outs.lock().unwrap();
+    assert_eq!(outs.len(), 1);
+    assert_eq!(outs[0], "0");
+
+    let errs = errs.lock().unwrap();
+    assert_eq!(errs.len(), 0);
 }
 
 #[test]
@@ -39,17 +43,21 @@ fn test_log() {
     let bin_path = compile_profiling("../test-resources/profiling/log");
     let wasm = fs::read(bin_path).unwrap();
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
-    let engine = gen_engine();
+    let rt = gen_rt();
 
-    let (data, r) = engine.run_profiling(profiling);
+    let (outs, errs, data) = gen_outs_errs_data();
+    let (_, r) = rt.run_profiling(data, &profiling);
+
     assert!(r.is_ok());
-    let out = data.output_log();
-    assert_eq!(out.len(), 3);
-    assert_eq!(out[0], "0");
-    assert_eq!(out[1], "1");
-    assert_eq!(out[2], "2");
-    let err = data.error_log();
-    assert_eq!(err.len(), 0);
+
+    let outs = outs.lock().unwrap();
+    assert_eq!(outs.len(), 3);
+    assert_eq!(outs[0], "0");
+    assert_eq!(outs[1], "1");
+    assert_eq!(outs[2], "2");
+
+    let errs = errs.lock().unwrap();
+    assert_eq!(errs.len(), 0);
 }
 
 #[test]
@@ -57,17 +65,21 @@ fn test_panic() {
     let bin_path = compile_profiling("../test-resources/profiling/panic");
     let wasm = fs::read(bin_path).unwrap();
     let profiling = unsafe { Profiling::from_precompiled(wasm) };
-    let engine = gen_engine();
+    let rt = gen_rt();
 
-    let (data, r) = engine.run_profiling(profiling);
+    let (outs, errs, data) = gen_outs_errs_data();
+    let (_, r) = rt.run_profiling(data, &profiling);
+
     assert!(r.is_err());
-    let out = data.output_log();
-    assert_eq!(out.len(), 1);
-    assert_eq!(out[0], "0");
-    let err = data.error_log();
-    assert_eq!(err.len(), 1);
+
+    let outs = outs.lock().unwrap();
+    assert_eq!(outs.len(), 1);
+    assert_eq!(outs[0], "0");
+
+    let errs = errs.lock().unwrap();
+    assert_eq!(errs.len(), 1);
     assert_eq!(
-        err[0],
+        errs[0],
         "Profiling panic: \npanicked at src/lib.rs:11:5:\noops"
     );
 }

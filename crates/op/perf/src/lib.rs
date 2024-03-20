@@ -79,11 +79,15 @@ impl From<DynamicPmuEvent> for Event {
 
 pub trait CounterGroupExt {
     fn enable(self) -> Result<FixedCounterGroup, String>;
+    fn into_fixed(self) -> Result<FixedCounterGroup, String>;
 }
 
 impl CounterGroupExt for CounterGroup {
     fn enable(self) -> Result<FixedCounterGroup, String> {
         CounterGroup::enable(self)
+    }
+    fn into_fixed(self) -> Result<FixedCounterGroup, String> {
+        CounterGroup::into_fixed(self)
     }
 }
 

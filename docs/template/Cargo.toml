@@ -3,9 +3,10 @@ name = "profiling-template"
 version = "0.0.0"
 edition = "2021"
 
-[lib]
-name = "profiling"
-crate-type = ["cdylib"]
+[package.metadata.component]
+package = "psh:profiling"
+
+[package.metadata.component.target.dependencies]
 
 #[profile.release]
 #lto = true
@@ -13,4 +14,4 @@ crate-type = ["cdylib"]
 #codegen-units = 1
 
 [dependencies]
-profiling = { path = "..", features = ["prelude"] }
+profiling = { path = "../.." }

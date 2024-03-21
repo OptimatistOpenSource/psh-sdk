@@ -1,3 +1,4 @@
+#[allow(clippy::all)]
 mod bindings;
 
 pub mod perf;

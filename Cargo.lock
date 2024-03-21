@@ -82,10 +82,6 @@ dependencies = [
 [[package]]
 name = "profiling"
 version = "0.1.0"
-dependencies = [
- "profiling-op-perf",
- "profiling-op-system",
-]
 
 [[package]]
 name = "profiling-op-perf"
@@ -97,9 +93,6 @@ dependencies = [
 [[package]]
 name = "profiling-op-system"
 version = "0.1.0"
-dependencies = [
- "wit-bindgen",
-]
 
 [[package]]
 name = "profiling-template"

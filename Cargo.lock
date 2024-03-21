@@ -94,6 +94,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "profiling-op-system"
+version = "0.1.0"
+dependencies = [
+ "wit-bindgen",
+]
+
+[[package]]
 name = "profiling-template"
 version = "0.0.0"
 dependencies = [

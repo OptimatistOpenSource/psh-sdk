@@ -84,6 +84,7 @@ name = "profiling"
 version = "0.1.0"
 dependencies = [
  "profiling-op-perf",
+ "profiling-op-system",
 ]
 
 [[package]]

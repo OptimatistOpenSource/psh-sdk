@@ -1,3 +1,4 @@
+#[allow(clippy::all)]
 mod imports;
 
 mod ty;
@@ -5,6 +6,7 @@ mod ty;
 use std::ops::Not;
 pub use ty::*;
 
+#[allow(clippy::derivable_impls)]
 impl Default for ExtraConfig {
     fn default() -> Self {
         Self {

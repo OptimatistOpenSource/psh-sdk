@@ -1,4 +1,5 @@
-use profiling::perf::*;
+use profiling::perf::config::*;
+use profiling::perf::counter::*;
 
 fn main() {
     let cfg = Config {

@@ -1,7 +1,10 @@
-pub mod perf {
-    pub use profiling_op_perf::*;
-}
+#[allow(clippy::all)]
+mod bindings;
 
-pub mod system {
-    pub use profiling_op_system::*;
+pub mod perf;
+pub mod system;
+
+#[inline]
+pub fn name() -> String {
+    bindings::name()
 }

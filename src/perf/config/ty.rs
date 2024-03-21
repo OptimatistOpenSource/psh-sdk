@@ -1,5 +1,5 @@
 #![cfg_attr(rustfmt, rustfmt_skip)]
-use crate::imports::profiling::perf;
+use crate::bindings::profiling::perf;
 
 // profiling:perf/config
 pub type Event             = perf::config::Event;
@@ -22,13 +22,3 @@ pub type ExtraConfig       = perf::config::ExtraConfig;
 pub type Config            = perf::config::Config;
 pub type Process           = perf::config::Process;
 pub type Cpu               = perf::config::Cpu;
-
-// profiling:perf/counter
-pub type Counter     = perf::counter::Counter;
-pub type CounterStat = perf::counter::CounterStat;
-
-// profiling:perf/counter-group
-pub type CounterGroup      = perf::counter_group::CounterGroup;
-pub type FixedCounterGroup = perf::counter_group::FixedCounterGroup;
-pub type CounterGroupStat  = perf::counter_group::CounterGroupStat;
-pub type CounterGuard      = perf::counter_group::CounterGuard;

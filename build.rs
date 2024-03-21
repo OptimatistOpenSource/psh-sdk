@@ -9,7 +9,7 @@ fn main() {
         .expect("Failed to update git submodule");
 
     // Generate bindings
-    let _ = fs::remove_file("src/imports.rs");
+    let _ = fs::remove_file("src/bindings.rs");
     Command::new("wit-bindgen")
         .args(["rust", "--out-dir", "src", "wit"])
         .status()

@@ -1,7 +1,0 @@
-[package]
-name = "profiling-op-perf"
-version.workspace = true
-edition = "2021"
-
-[dependencies]
-wit-bindgen = "0.22.0"

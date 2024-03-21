@@ -6,7 +6,6 @@ edition = "2021"
 [workspace]
 members = [
     "docs/template",
-    "crates/op/*"
 ]
 exclude = [
 ]
@@ -16,11 +15,5 @@ version = "0.1.0"
 
 [features]
 
-#[profile.release]
-#lto = true
-#strip = true
-#codegen-units = 1
-
 [dependencies]
-profiling-op-perf = { path = "crates/op/perf" }
-profiling-op-system = { path = "crates/op/system" }
+wit-bindgen = "0.22.0"

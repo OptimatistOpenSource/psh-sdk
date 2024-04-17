@@ -1,5 +1,5 @@
 #![cfg_attr(rustfmt, rustfmt_skip)]
-use crate::bindings::profiling::perf;
+use crate::wit::profiling::perf;
 
 // profiling:perf/counter-group
 pub type CounterGroup      = perf::counter_group::CounterGroup;

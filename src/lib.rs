@@ -1,10 +1,9 @@
-#[allow(clippy::all)]
-mod bindings;
+mod wit;
 
 pub mod perf;
 pub mod system;
 
 #[inline]
 pub fn name() -> String {
-    bindings::name()
+    wit::name()
 }

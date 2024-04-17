@@ -1,1 +1,1 @@
-pub use crate::bindings::profiling::system::*;
+pub use crate::wit::profiling::system::*;

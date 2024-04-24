@@ -14,7 +14,7 @@ pub mod os;
 pub mod process;
 pub mod rps;
 
-// abstract identification of some system resource such as Process/Network/Disk
+// abstract identification of some system resource, i.e., Process/Network/Disk
 // example: pid for Process, network interface name for network devices
 trait StatKey {
     type Key;
@@ -23,10 +23,19 @@ trait StatKey {
 
 // abstract interface for update resource with some stat
 // example: Update Process with ProcessStat
-// return value indicates whether this resource should be kept in final resource table
 trait Update {
     type Stat;
     fn update(&mut self, stat: Self::Stat, duration: Duration) -> bool;
+}
+
+bitflags::bitflags! {
+    /// Composable ResourceKind type to specify what resources System instance should track.
+    #[derive(Debug, Clone, Copy)]
+    pub struct ResourceKind : u32 {
+        const Disk    = 0b0000_0000_0001;
+        const Network = 0b0000_0000_0010;
+        const Process = 0b0000_0000_0100;
+    }
 }
 
 /// System is the main type sdk user need to use to retrieve information about system
@@ -34,20 +43,35 @@ trait Update {
 /// # Example
 ///
 /// ```rust
-/// use profiling::system::System;
+/// use profiling::system::{ResourceKind, System};
 /// use std::error::Error;
 ///
 /// fn main() -> Result<(), Box<dyn Error>> {
-///     let mut system = System::new()?;
+///     // initialize system with Process/Disk ResourceKind enabled
+///     let mut system = System::with_resource_kinds(ResourceKind::Process | ResourceKind::Disk)?;
 ///     loop {
 ///         std::thread::sleep(std::time::Duration::from_secs(1));
 ///         // refresh system stat before retrieve any information
 ///         system.refresh()?;
-///         let mut procs: Vec<_> = system.processes().values().collect();
+///         let mut procs: Vec<_> = system
+///             .processes()
+///             .values()
+///             // keep only processes start directly by init
+///             .filter(|proc| proc.parent_id == 1)
+///             .collect();
 ///         // sort process by cpu_usage and take the top 5 process uses the most cpu
 ///         procs.sort_unstable_by(|lhs, rhs| rhs.cpu_usage.total_cmp(&lhs.cpu_usage));
 ///         for proc in procs.iter().take(5) {
-///             println!("{:20} {:6.2}%", proc.name, proc.cpu_usage * 100.0);
+///             println!(
+///                 "{:20}[{:6}/{:6}] CPU: {:6.2}% | MEM: {:10.2}KiB | REA: {:8.2}KiB/s | WRI: {:8.2}KiB/s",
+///                 proc.name,
+///                 proc.pid,
+///                 proc.parent_id,
+///                 proc.cpu_usage * 100.0,
+///                 proc.mem_usage as f64 / 1024.0,
+///                 proc.read_bps / 1024.0,
+///                 proc.write_bps / 1024.0,
+///             );
 ///         }
 ///         println!();
 ///     }
@@ -55,33 +79,30 @@ trait Update {
 /// ```
 pub struct System {
     timestamp: Instant,
+    kind: ResourceKind,
     procs: HashMap<i32, process::Process>,
     nets: HashMap<String, network::Network>,
     dsks: HashMap<String, disk::Disk>,
 }
 
 impl System {
-    // generic function for update Resource table with Vec of stat and duration
+    // generic function for updating resource hashmap
     fn update<K, V, S>(resources: &mut HashMap<K, V>, stats: Vec<S>, duration: Duration)
     where
         K: Hash + Eq,
         S: StatKey<Key = K>,
         V: Update<Stat = S> + TryFrom<S>,
     {
+        // can we do better?
         let mut table: HashMap<K, S> = stats.into_iter().map(|s| (s.key(), s)).collect();
-        // for a `(key, resource)` pair in `resources`, it no longer exists if it's key
-        // is not contained in `table`, in which case it will be removed from `reources`,
-        // if it exist in `table`, the corresponding `stat` will be removed from table
-        // and used to update `resource`
+        // for a (key, resource) in hashMap resources, it will be removed if the key is not in table or update()
+        // against resource failed returns false, otherwise, the hashMap resources contains latest resources status.
         resources.retain(|key, res| {
             table
                 .remove(key)
                 .map_or(false, |stat| res.update(stat, duration))
         });
-        // table only contains new `stat` after previous line,
-        // we need to convert `stat` to `resource` and insert these new resources to hash table
-        // in case some of these conversion failed, we want to filter it out rather than return Err
-        // so we use filter_map rather than map&collect
+        // after updating, extend hashMap resources to cover new resources that are remained in table.
         resources.extend(
             table
                 .into_iter()
@@ -89,46 +110,80 @@ impl System {
         );
     }
 
-    // generic function for initialize a resource table with Vec of stat
+    // generic function for initializing resource hashmap
     fn init<K, V, S>(stats: Vec<S>) -> HashMap<K, V>
     where
         K: Hash + Eq,
         S: StatKey<Key = K>,
         V: TryFrom<S>,
     {
-        // in case some of TryFrom failed, we want to filter it out rather than return Err
-        // so we use filter_map&collect rather than map&collect
         stats
             .into_iter()
-            .filter_map(|stat| Some(stat.key()).zip(V::try_from(stat).ok()))
+            .filter_map(|stat| {
+                let key = stat.key();
+                Some(key).zip(V::try_from(stat).ok())
+            })
             .collect()
     }
 
-    /// create a new system instance for resource query
-    pub fn new() -> Result<Self, String> {
+    fn get_processes_stats(kind: ResourceKind) -> Result<Vec<process::ProcessStat>, String> {
+        if kind.contains(ResourceKind::Process) {
+            process::all()
+        } else {
+            Ok(vec![])
+        }
+    }
+
+    fn get_networks_stats(kind: ResourceKind) -> Result<Vec<network::NetworkStat>, String> {
+        if kind.contains(ResourceKind::Network) {
+            network::stat()
+        } else {
+            Ok(vec![])
+        }
+    }
+
+    fn get_disks_stats(kind: ResourceKind) -> Result<Vec<disk::DiskStat>, String> {
+        if kind.contains(ResourceKind::Disk) {
+            disk::stat()
+        } else {
+            Ok(vec![])
+        }
+    }
+
+    /// create a new system instance with every resource kind enabled
+    pub fn everything() -> Result<Self, String> {
+        let kind = ResourceKind::all();
+        Self::with_resource_kinds(kind)
+    }
+
+    /// create a new system instance with specified resource kinds
+    pub fn with_resource_kinds(kind: ResourceKind) -> Result<Self, String> {
         let timestamp = Instant::now();
-        let procs = process::all()?;
-        let networks = network::stat()?;
-        let disks = disk::stat()?;
+        let procs = Self::get_processes_stats(kind)?;
+        let networks = Self::get_networks_stats(kind)?;
+        let disks = Self::get_disks_stats(kind)?;
         Ok(Self {
             timestamp,
-            procs: System::init(procs),
-            nets: System::init(networks),
-            dsks: System::init(disks),
+            procs: Self::init(procs),
+            nets: Self::init(networks),
+            dsks: Self::init(disks),
+            kind,
         })
     }
 
     /// refresh system snapshots,
-    /// you should call this before query information such as processes
+    /// you should call this before query information, i.e., processes,
+    /// for performance and accuracy reasons, you should wait at least 100ms between
+    /// each refresh calls, 1000ms is recommanded.
     pub fn refresh(&mut self) -> Result<(), String> {
         let timestamp = Instant::now();
         let duration = timestamp - self.timestamp;
-        let procs = process::all()?;
-        let networks = network::stat()?;
-        let disks = disk::stat()?;
-        System::update(&mut self.procs, procs, duration);
-        System::update(&mut self.nets, networks, duration);
-        System::update(&mut self.dsks, disks, duration);
+        let procs = Self::get_processes_stats(self.kind)?;
+        let networks = Self::get_networks_stats(self.kind)?;
+        let disks = Self::get_disks_stats(self.kind)?;
+        Self::update(&mut self.procs, procs, duration);
+        Self::update(&mut self.nets, networks, duration);
+        Self::update(&mut self.dsks, disks, duration);
         // update timestamp after updated other resources
         self.timestamp = timestamp;
         Ok(())

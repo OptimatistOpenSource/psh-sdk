@@ -23,7 +23,7 @@ impl StatKey for ProcessStat {
 /// use std::error::Error;
 ///
 /// fn main() -> Result<(), Box<dyn Error>> {
-///     let mut system = System::new()?;
+///     let mut system = System::everything()?;
 ///     loop {
 ///         std::thread::sleep(std::time::Duration::from_secs(1));
 ///         system.refresh()?;

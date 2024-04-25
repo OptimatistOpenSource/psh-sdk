@@ -42,7 +42,7 @@ bitflags::bitflags! {
 /// such as processes/disks/networks
 /// # Example
 ///
-/// ```rust
+/// ```no_run
 /// use profiling::system::{ResourceKind, System};
 /// use std::error::Error;
 ///

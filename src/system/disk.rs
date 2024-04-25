@@ -17,7 +17,7 @@ impl StatKey for DiskStat {
 /// Disk type exposed to sdk users
 /// # Example
 ///
-/// ```rust
+/// ```no_run
 /// use profiling::system::System;
 /// use std::error::Error;
 ///

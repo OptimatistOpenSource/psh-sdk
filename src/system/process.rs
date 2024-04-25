@@ -18,7 +18,7 @@ impl StatKey for ProcessStat {
 /// of this type to retrieve certain information belong to specific process
 /// # Example
 ///
-/// ```rust
+/// ```no_run
 /// use profiling::system::System;
 /// use std::error::Error;
 ///

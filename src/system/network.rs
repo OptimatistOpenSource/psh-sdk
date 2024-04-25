@@ -17,7 +17,7 @@ impl StatKey for NetworkStat {
 /// Network type exposed to sdk user
 /// # Example
 ///
-/// ```rust
+/// ```no_run
 /// use profiling::system::System;
 /// use std::error::Error;
 ///

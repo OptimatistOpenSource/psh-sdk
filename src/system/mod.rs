@@ -80,48 +80,40 @@ bitflags::bitflags! {
 pub struct System {
     timestamp: Instant,
     kind: ResourceKind,
-    procs: HashMap<i32, process::Process>,
-    nets: HashMap<String, network::Network>,
-    dsks: HashMap<String, disk::Disk>,
+    // since we often move resource when updating, we use Box<T> to reduce move cost
+    procs: HashMap<i32, Box<process::Process>>,
+    nets: HashMap<String, Box<network::Network>>,
+    dsks: HashMap<String, Box<disk::Disk>>,
 }
 
 impl System {
-    // generic function for updating resource hashmap
-    fn update<K, V, S>(resources: &mut HashMap<K, V>, stats: Vec<S>, duration: Duration)
+    // generic function for updating resource hashmap,
+    // this will move resources out of old resource hashmap and create
+    // new hashmap for performance reasons
+    // NOTE: we use this for initialization as well, since initialization is just
+    // updating with an empty old resource hashmap and an arbitrary duration
+    // this unifies our logic for initialization and update
+    fn resources_iteration<K, V, S>(
+        old: &mut HashMap<K, Box<V>>,
+        stats: Vec<S>,
+        duration: Duration,
+    ) -> HashMap<K, Box<V>>
     where
         K: Hash + Eq,
         S: StatKey<Key = K>,
         V: Update<Stat = S> + TryFrom<S>,
     {
-        // can we do better?
-        let mut table: HashMap<K, S> = stats.into_iter().map(|s| (s.key(), s)).collect();
-        // for a (key, resource) in hashMap resources, it will be removed if the key is not in table or update()
-        // against resource failed returns false, otherwise, the hashMap resources contains latest resources status.
-        resources.retain(|key, res| {
-            table
-                .remove(key)
-                .map_or(false, |stat| res.update(stat, duration))
-        });
-        // after updating, extend hashMap resources to cover new resources that are remained in table.
-        resources.extend(
-            table
-                .into_iter()
-                .filter_map(|(key, stat)| Some(key).zip(V::try_from(stat).ok())),
-        );
-    }
-
-    // generic function for initializing resource hashmap
-    fn init<K, V, S>(stats: Vec<S>) -> HashMap<K, V>
-    where
-        K: Hash + Eq,
-        S: StatKey<Key = K>,
-        V: TryFrom<S>,
-    {
         stats
             .into_iter()
             .filter_map(|stat| {
                 let key = stat.key();
-                Some(key).zip(V::try_from(stat).ok())
+                match old.remove(&key) {
+                    Some(mut res) => {
+                        res.update(stat, duration);
+                        Some((key, res))
+                    }
+                    None => Some(key).zip(V::try_from(stat).ok().map(Box::new)),
+                }
             })
             .collect()
     }
@@ -162,11 +154,16 @@ impl System {
         let procs = Self::get_processes_stats(kind)?;
         let networks = Self::get_networks_stats(kind)?;
         let disks = Self::get_disks_stats(kind)?;
+        // this duration won't be used inside resources_iteration here
+        let duration = std::time::Duration::from_secs(1);
+        let procs = Self::resources_iteration(&mut HashMap::new(), procs, duration);
+        let nets = Self::resources_iteration(&mut HashMap::new(), networks, duration);
+        let dsks = Self::resources_iteration(&mut HashMap::new(), disks, duration);
         Ok(Self {
             timestamp,
-            procs: Self::init(procs),
-            nets: Self::init(networks),
-            dsks: Self::init(disks),
+            procs,
+            nets,
+            dsks,
             kind,
         })
     }
@@ -181,26 +178,26 @@ impl System {
         let procs = Self::get_processes_stats(self.kind)?;
         let networks = Self::get_networks_stats(self.kind)?;
         let disks = Self::get_disks_stats(self.kind)?;
-        Self::update(&mut self.procs, procs, duration);
-        Self::update(&mut self.nets, networks, duration);
-        Self::update(&mut self.dsks, disks, duration);
+        self.procs = Self::resources_iteration(&mut self.procs, procs, duration);
+        self.nets = Self::resources_iteration(&mut self.nets, networks, duration);
+        self.dsks = Self::resources_iteration(&mut self.dsks, disks, duration);
         // update timestamp after updated other resources
         self.timestamp = timestamp;
         Ok(())
     }
 
     /// retrieve processes
-    pub fn processes(&self) -> &HashMap<i32, process::Process> {
+    pub fn processes(&self) -> &HashMap<i32, Box<process::Process>> {
         &self.procs
     }
 
     /// retrieve networks
-    pub fn networks(&self) -> &HashMap<String, network::Network> {
+    pub fn networks(&self) -> &HashMap<String, Box<network::Network>> {
         &self.nets
     }
 
     /// retrieve disks
-    pub fn disks(&self) -> &HashMap<String, disk::Disk> {
+    pub fn disks(&self) -> &HashMap<String, Box<disk::Disk>> {
         &self.dsks
     }
 }

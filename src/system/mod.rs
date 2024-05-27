@@ -118,25 +118,34 @@ impl System {
             .collect()
     }
 
-    fn get_processes_stats(kind: ResourceKind) -> Result<Vec<process::ProcessStat>, String> {
+    fn get_processes_stats(
+        kind: ResourceKind,
+        dur_hint: Duration,
+    ) -> Result<Vec<process::ProcessStat>, String> {
         if kind.contains(ResourceKind::Process) {
-            process::all()
+            process::all(dur_hint.as_millis() as u64)
         } else {
             Ok(vec![])
         }
     }
 
-    fn get_networks_stats(kind: ResourceKind) -> Result<Vec<network::NetworkStat>, String> {
+    fn get_networks_stats(
+        kind: ResourceKind,
+        dur_hint: Duration,
+    ) -> Result<Vec<network::NetworkStat>, String> {
         if kind.contains(ResourceKind::Network) {
-            network::stat()
+            network::stat(dur_hint.as_millis() as u64)
         } else {
             Ok(vec![])
         }
     }
 
-    fn get_disks_stats(kind: ResourceKind) -> Result<Vec<disk::DiskStat>, String> {
+    fn get_disks_stats(
+        kind: ResourceKind,
+        dur_hint: Duration,
+    ) -> Result<Vec<disk::DiskStat>, String> {
         if kind.contains(ResourceKind::Disk) {
-            disk::stat()
+            disk::stat(dur_hint.as_millis() as u64)
         } else {
             Ok(vec![])
         }
@@ -151,11 +160,11 @@ impl System {
     /// create a new system instance with specified resource kinds
     pub fn with_resource_kinds(kind: ResourceKind) -> Result<Self, String> {
         let timestamp = Instant::now();
-        let procs = Self::get_processes_stats(kind)?;
-        let networks = Self::get_networks_stats(kind)?;
-        let disks = Self::get_disks_stats(kind)?;
-        // this duration won't be used inside resources_iteration here
         let duration = std::time::Duration::from_secs(1);
+        let procs = Self::get_processes_stats(kind, duration)?;
+        let networks = Self::get_networks_stats(kind, duration)?;
+        let disks = Self::get_disks_stats(kind, duration)?;
+        // this duration won't be used inside resources_iteration here
         let procs = Self::resources_iteration(&mut HashMap::new(), procs, duration);
         let nets = Self::resources_iteration(&mut HashMap::new(), networks, duration);
         let dsks = Self::resources_iteration(&mut HashMap::new(), disks, duration);
@@ -175,9 +184,9 @@ impl System {
     pub fn refresh(&mut self) -> Result<(), String> {
         let timestamp = Instant::now();
         let duration = timestamp - self.timestamp;
-        let procs = Self::get_processes_stats(self.kind)?;
-        let networks = Self::get_networks_stats(self.kind)?;
-        let disks = Self::get_disks_stats(self.kind)?;
+        let procs = Self::get_processes_stats(self.kind, duration)?;
+        let networks = Self::get_networks_stats(self.kind, duration)?;
+        let disks = Self::get_disks_stats(self.kind, duration)?;
         self.procs = Self::resources_iteration(&mut self.procs, procs, duration);
         self.nets = Self::resources_iteration(&mut self.nets, networks, duration);
         self.dsks = Self::resources_iteration(&mut self.dsks, disks, duration);

@@ -17,4 +17,4 @@ version = "0.1.0"
 
 [dependencies]
 bitflags = "2.5.0"
-wit-bindgen = "0.22.0"
+wit-bindgen = "0.37.0"

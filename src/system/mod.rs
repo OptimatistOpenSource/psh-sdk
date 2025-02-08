@@ -13,6 +13,7 @@ pub mod network;
 pub mod os;
 pub mod process;
 pub mod rps;
+pub mod vmstat;
 
 // abstract identification of some system resource, i.e., Process/Network/Disk
 // example: pid for Process, network interface name for network devices
